@@ -1,0 +1,167 @@
+{
+ "project": "社長ショート_AI動画編集",
+ "tone": "trust",
+ "brand": {
+  "accent": "#FEDB2E",
+  "channel": "山田社長｜AIと経営のリアル"
+ },
+ "sources": {
+  "talk": "footage/talk.MOV"
+ },
+ "cues": "cues.json",
+ "versions": {
+  "short_trust": {
+   "format": "short",
+   "aspect": "9:16",
+   "tone": "trust",
+   "title": "【緊急】{AIの動画編集}が｜ここまで来た",
+   "parts": [
+    {
+     "kind": "talk",
+     "src": "talk",
+     "from": 1.5,
+     "to": 114.5
+    }
+   ],
+   "overlays": [
+    {
+     "type": "chapter",
+     "src": "talk",
+     "at": 43.0,
+     "text": "構成もAIにおまかせ"
+    },
+    {
+     "type": "emphasis",
+     "src": "talk",
+     "at": 65.9,
+     "text": "ついに来たか"
+    },
+    {
+     "type": "card",
+     "src": "talk",
+     "at": 74.9,
+     "dur": 6.5,
+     "title": "Claudeのここがいい",
+     "items": [
+      "デザインセンス",
+      "ツールを使いこなす",
+      "エージェントが動く"
+     ]
+    }
+   ]
+  },
+  "short_variety": {
+   "format": "short",
+   "aspect": "9:16",
+   "tone": "variety",
+   "title": "【緊急】{AIの動画編集}が｜ここまで来た",
+   "parts": [
+    {
+     "kind": "talk",
+     "src": "talk",
+     "from": 1.5,
+     "to": 114.5
+    }
+   ],
+   "overlays": [
+    {
+     "type": "chapter",
+     "src": "talk",
+     "at": 43.0,
+     "text": "構成もAIにおまかせ"
+    },
+    {
+     "type": "emphasis",
+     "src": "talk",
+     "at": 65.9,
+     "text": "ついに来たか"
+    },
+    {
+     "type": "card",
+     "src": "talk",
+     "at": 74.9,
+     "dur": 6.5,
+     "title": "Claudeのここがいい",
+     "items": [
+      "デザインセンス",
+      "ツールを使いこなす",
+      "エージェントが動く"
+     ]
+    }
+   ]
+  },
+  "yt_trust": {
+   "format": "youtube",
+   "aspect": "16:9",
+   "tone": "trust",
+   "parts": [
+    {
+     "kind": "clip",
+     "src": "talk",
+     "from": 65.9,
+     "to": 68.0,
+     "fit": "band"
+    },
+    {
+     "kind": "clip",
+     "src": "talk",
+     "from": 72.9,
+     "to": 74.5,
+     "fit": "band"
+    },
+    {
+     "kind": "card",
+     "card": "title",
+     "dur": 2.2,
+     "text": "AI動画編集、ここまで来た"
+    },
+    {
+     "kind": "talk",
+     "src": "talk",
+     "from": 1.5,
+     "to": 114.5,
+     "fit": "band"
+    },
+    {
+     "kind": "card",
+     "card": "end",
+     "dur": 4.5
+    }
+   ],
+   "overlays": [
+    {
+     "type": "name",
+     "src": "talk",
+     "at": 3.0,
+     "text": "社長",
+     "sub": "AI活用の実践"
+    },
+    {
+     "type": "chapter",
+     "src": "talk",
+     "at": 43.0,
+     "text": "構成もAIにおまかせ"
+    },
+    {
+     "type": "emphasis",
+     "src": "talk",
+     "at": 65.9,
+     "text": "ついに来たか"
+    },
+    {
+     "type": "card",
+     "src": "talk",
+     "at": 74.9,
+     "dur": 6.5,
+     "title": "Claudeのここがいい",
+     "items": [
+      "デザインセンス",
+      "ツールを使いこなす",
+      "エージェントが動く"
+     ]
+    }
+   ]
+  }
+ },
+ "_note": "縦2分のトーク素材で作り比べたときの構成表。short_trust / short_variety は同じ素材をトンマナだけ変えた2本、yt_trust は冒頭ダイジェスト・タイトル・本編・終了画面の横版。cues.json は transcribe.py → 手直し → --align で作る。"
+}

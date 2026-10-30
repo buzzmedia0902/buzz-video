@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.DS_Store
+# folders the skills create while editing (if someone runs them inside the repo)
+work/
+納品/

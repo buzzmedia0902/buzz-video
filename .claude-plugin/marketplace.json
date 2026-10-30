@@ -1,0 +1,12 @@
+{
+  "name": "buzz-video",
+  "description": "BUZZ MEDIA の動画編集スキル（発信動画・SNS広告動画）",
+  "owner": {"name": "BUZZ MEDIA", "url": "https://github.com/buzzmedia0902"},
+  "plugins": [
+    {
+      "name": "buzz-video",
+      "source": "./",
+      "description": "発信動画（YouTube・ショート・切り抜き・Vlog）と SNS 広告動画の編集スキル。トンマナを選んでから、テロップ・BGM作曲・音量調整・サムネまで"
+    }
+  ]
+}

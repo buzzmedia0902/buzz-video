@@ -1,0 +1,2101 @@
+{
+ "_note": "美容鍼サロンの実案件で作った10バージョンの作例（店名・タグライン・素材のパスは差し替え済み）。chat / vlog の体験談風の文言と施術の流れ（steps）は、構成の書き方を見せるための例。鍼灸・医療・化粧品などでは references/ad-rules.md に従って書き換える（体験談・効果の表現は使わず、必要なら公式アカウントのQ&A形式にする）。素材とロゴのパスは環境に合わせて書き換える。standard=24秒の王道広告 / motion=13秒 / cinematic=24秒 / vlog=24秒ナレーション / chat=21秒LINE風。*_15 / *_20 / *_short は同じテイストの長さ違い、chat_options は設定項目の見本。",
+ "project": "SALON_SAMPLE",
+ "footage_dir": "~/Movies/salon_footage",
+ "out_dir": "納品",
+ "work_dir": "work",
+ "platform": "meta",
+ "cta": "ご予約はリンクから",
+ "brand": {
+  "name": "SALON SAMPLE",
+  "logo": "brand/logo.png",
+  "label": "BEAUTY ACUPUNCTURE",
+  "tagline": "がんばる自分に、ごほうびを。",
+  "colors": {
+   "accent": "#D2BF5B",
+   "ink": "#221E1B",
+   "paper": "#F7F3EA",
+   "night": "#1E1915"
+  }
+ },
+ "clips": {
+  "IMG_0996.MOV": {
+   "note": "カウンセリング（iPad）。背景の販促POPをぼかす",
+   "focus": [
+    0.3843,
+    0.5078,
+    0.1528,
+    0.1713,
+    16
+   ],
+   "patches": [
+    [
+     0.5,
+     0.3646,
+     0.1574,
+     0.0741,
+     18
+    ]
+   ]
+  },
+  "IMG_2739.MOV": {
+   "note": "施術後の笑顔。上下逆さに撮影",
+   "rot": 180,
+   "patches": [
+    [
+     0.8333,
+     0.4479,
+     0.213,
+     0.1852,
+     18
+    ],
+    [
+     0.6019,
+     0.4714,
+     0.088,
+     0.0833,
+     16
+    ]
+   ]
+  },
+  "IMG_2741.MOV": {
+   "note": "鍼の寝顔。上下逆さ",
+   "rot": 180,
+   "soft_below": 0.6
+  },
+  "IMG_2742.MOV": {
+   "note": "鍼の寝顔アップ。上下逆さ。下端のTシャツのロゴをぼかす",
+   "rot": 180,
+   "soft_below": 0.58
+  },
+  "IMG_1444 2.mov": {
+   "note": "PC作業→笑顔",
+   "patches": [
+    [
+     0.2917,
+     0.6573,
+     0.0574,
+     0.0611,
+     14
+    ]
+   ]
+  },
+  "IMG_1454 2.mov": {
+   "note": "PC作業（スタンダード広告）。左下のPCロゴをぼかす",
+   "patches": [
+    [
+     0.0787,
+     0.6875,
+     0.0574,
+     0.0574,
+     12
+    ]
+   ]
+  }
+ },
+ "versions": {
+  "standard": {
+   "taste": "standard",
+   "duration": 24,
+   "hook_logo": true,
+   "bgm": {
+    "style": "piano"
+   },
+   "card": {
+    "dur": 3.6,
+    "transition": "whiteout",
+    "tdur": 0.48
+   },
+   "shots": [
+    {
+     "clip": "IMG_2742.MOV",
+     "dur": 1.8,
+     "in": 2.85,
+     "speed": 0.5,
+     "zoom": [
+      1.42,
+      1.3
+     ],
+     "center": [
+      [
+       0.46,
+       0.36
+      ],
+      [
+       0.46,
+       0.35
+      ]
+     ],
+     "soft_below": 0,
+     "patches": [
+      [
+       0.58,
+       0.74,
+       0.36,
+       0.065,
+       14
+      ]
+     ],
+     "caption": {
+      "rows": [
+       {
+        "text": "顔に、鍼。",
+        "size": 140,
+        "font": "title",
+        "tracking": 0.06
+       }
+      ],
+      "label": "BEAUTY ACUPUNCTURE",
+      "pos": 0.297
+     }
+    },
+    {
+     "clip": "IMG_1454 2.mov",
+     "dur": 1.8,
+     "in": 7.5,
+     "zoom": [
+      1.4,
+      1.46
+     ],
+     "center": [
+      [
+       0.42,
+       0.42
+      ],
+      [
+       0.42,
+       0.415
+      ]
+     ],
+     "grade": "daily",
+     "transition": "cut",
+     "caption": {
+      "rows": [
+       "画面と、",
+       "にらめっこの毎日。"
+      ],
+      "theme": "dark",
+      "pos": 0.277
+     }
+    },
+    {
+     "clip": "IMG_1446 2.mov",
+     "dur": 1.8,
+     "in": 4.9,
+     "zoom": [
+      1.12,
+      1.2
+     ],
+     "center": [
+      [
+       0.58,
+       0.33
+      ],
+      [
+       0.58,
+       0.31
+      ]
+     ],
+     "grade": "daily",
+     "transition": "cut",
+     "caption": {
+      "rows": [
+       "ふと、",
+       "頬に手がのびる。"
+      ],
+      "pos": 0.88,
+      "aspect": {
+       "4:5": {
+        "pos": "top"
+       },
+       "1:1": {
+        "pos": "top"
+       }
+      }
+     }
+    },
+    {
+     "clip": "IMG_1459 2.mov",
+     "dur": 1.8,
+     "in": 11.3,
+     "zoom": [
+      1.22,
+      1.3
+     ],
+     "center": [
+      [
+       0.52,
+       0.38
+      ],
+      [
+       0.52,
+       0.37
+      ]
+     ],
+     "grade": "daily",
+     "transition": "cut",
+     "caption": {
+      "rows": [
+       "目覚めても、",
+       "ため息ひとつ。"
+      ],
+      "theme": "dark",
+      "pos": 0.205,
+      "out": 0.08
+     }
+    },
+    {
+     "clip": "IMG_0996.MOV",
+     "dur": 2.4,
+     "in": 3.4,
+     "zoom": [
+      1.36,
+      1.44
+     ],
+     "center": [
+      [
+       0.42,
+       0.5
+      ],
+      [
+       0.43,
+       0.49
+      ]
+     ],
+     "grade": "counsel",
+     "transition": "flash",
+     "tdur": 0.48,
+     "caption": {
+      "rows": [
+       "あなたの顔を、",
+       "知ることから。"
+      ],
+      "label": "COUNSELING",
+      "theme": "dark",
+      "pos": 0.134
+     }
+    },
+    {
+     "clip": "IMG_2722.MOV",
+     "dur": 2.4,
+     "in": 0.85,
+     "speed": 0.5,
+     "zoom": [
+      1.12,
+      1.2
+     ],
+     "center": [
+      0.5,
+      0.42
+     ],
+     "transition": "dissolve",
+     "caption": {
+      "rows": [
+       "一本一本、",
+       "ていねいに。"
+      ],
+      "label": "TREATMENT",
+      "pos": 0.134
+     }
+    },
+    {
+     "clip": "IMG_2741.MOV",
+     "dur": 1.52,
+     "in": 0.12,
+     "speed": 0.5,
+     "zoom": [
+      1.32,
+      1.26
+     ],
+     "center": [
+      [
+       0.58,
+       0.37
+      ],
+      [
+       0.58,
+       0.36
+      ]
+     ],
+     "soft_below": 0,
+     "patches": [
+      [
+       0.34,
+       0.745,
+       0.3,
+       0.085,
+       14
+      ]
+     ],
+     "transition": "dissolve",
+     "caption": {
+      "rows": [
+       "ゆだねる、",
+       "しずかな時間。"
+      ],
+      "pos": 0.134
+     }
+    },
+    {
+     "clip": "IMG_2722.MOV",
+     "dur": 0.88,
+     "in": 11.55,
+     "speed": 0.5,
+     "zoom": [
+      1.28,
+      1.22
+     ],
+     "center": [
+      [
+       0.42,
+       0.56
+      ],
+      [
+       0.42,
+       0.55
+      ]
+     ],
+     "transition": "dissolve",
+     "tdur": 0.24
+    },
+    {
+     "clip": "IMG_2739.MOV",
+     "dur": 2.4,
+     "in": 5.15,
+     "speed": 0.5,
+     "zoom": [
+      1.04,
+      1.09
+     ],
+     "center": [
+      [
+       0.5,
+       0.5
+      ],
+      [
+       0.48,
+       0.49
+      ]
+     ],
+     "transition": "dissolve",
+     "caption": {
+      "rows": [
+       "思わず、",
+       "笑顔がこぼれる。"
+      ],
+      "pos": 0.9
+     }
+    },
+    {
+     "clip": "IMG_1444 2.mov",
+     "dur": 1.8,
+     "in": 8.1,
+     "zoom": [
+      1.38,
+      1.44
+     ],
+     "center": [
+      0.55,
+      0.42
+     ],
+     "grade": "daylight",
+     "transition": "flash",
+     "tdur": 0.32,
+     "caption": {
+      "rows": [
+       "がんばる毎日に、",
+       "ごほうびを。"
+      ],
+      "theme": "dark",
+      "pos": 0.256
+     }
+    },
+    {
+     "clip": "IMG_1460 2.mov",
+     "dur": 1.8,
+     "in": 29.0,
+     "zoom": [
+      1.15,
+      1.22
+     ],
+     "center": [
+      0.45,
+      0.4
+     ],
+     "grade": "daylight",
+     "transition": "dissolve",
+     "caption": {
+      "rows": [
+       "朝の光が、",
+       "うれしくなる。"
+      ],
+      "theme": "dark",
+      "pos": 0.205
+     }
+    }
+   ],
+   "fonts": {
+    "latin": "optima"
+   }
+  },
+  "standard_15": {
+   "taste": "standard",
+   "duration": 15,
+   "bgm": {
+    "style": "piano"
+   },
+   "shots": [
+    {
+     "clip": "IMG_2742.MOV",
+     "dur": 1.8,
+     "in": 2.85,
+     "speed": 0.5,
+     "zoom": [
+      1.42,
+      1.3
+     ],
+     "center": [
+      [
+       0.46,
+       0.36
+      ],
+      [
+       0.46,
+       0.35
+      ]
+     ],
+     "soft_below": 0,
+     "patches": [
+      [
+       0.58,
+       0.74,
+       0.36,
+       0.065,
+       14
+      ]
+     ],
+     "caption": {
+      "rows": [
+       {
+        "text": "顔に、鍼。",
+        "size": 140,
+        "font": "title",
+        "tracking": 0.06
+       }
+      ],
+      "label": "BEAUTY ACUPUNCTURE",
+      "pos": 0.297
+     }
+    },
+    {
+     "clip": "IMG_1454 2.mov",
+     "dur": 1.6,
+     "in": 7.5,
+     "zoom": [
+      1.4,
+      1.46
+     ],
+     "center": [
+      [
+       0.42,
+       0.42
+      ],
+      [
+       0.42,
+       0.415
+      ]
+     ],
+     "grade": "daily",
+     "transition": "cut",
+     "caption": {
+      "rows": [
+       "画面と、",
+       "にらめっこの毎日。"
+      ],
+      "theme": "dark",
+      "pos": "upper"
+     }
+    },
+    {
+     "clip": "IMG_0996.MOV",
+     "dur": 2.0,
+     "in": 3.4,
+     "zoom": [
+      1.36,
+      1.44
+     ],
+     "center": [
+      [
+       0.42,
+       0.5
+      ],
+      [
+       0.43,
+       0.49
+      ]
+     ],
+     "grade": "counsel",
+     "transition": "flash",
+     "tdur": 0.4,
+     "caption": {
+      "rows": [
+       "あなたの顔を、",
+       "知ることから。"
+      ],
+      "label": "COUNSELING",
+      "theme": "dark",
+      "pos": "top"
+     }
+    },
+    {
+     "clip": "IMG_2722.MOV",
+     "dur": 2.4,
+     "in": 0.85,
+     "speed": 0.5,
+     "zoom": [
+      1.12,
+      1.2
+     ],
+     "center": [
+      0.5,
+      0.42
+     ],
+     "transition": "dissolve",
+     "caption": {
+      "rows": [
+       "一本一本、",
+       "ていねいに。"
+      ],
+      "label": "TREATMENT",
+      "pos": "top"
+     }
+    },
+    {
+     "clip": "IMG_2739.MOV",
+     "dur": 2.0,
+     "in": 5.15,
+     "speed": 0.5,
+     "zoom": [
+      1.04,
+      1.09
+     ],
+     "center": [
+      [
+       0.5,
+       0.5
+      ],
+      [
+       0.48,
+       0.49
+      ]
+     ],
+     "transition": "dissolve",
+     "caption": {
+      "rows": [
+       "思わず、",
+       "笑顔がこぼれる。"
+      ],
+      "pos": "bottom"
+     }
+    },
+    {
+     "clip": "IMG_1460 2.mov",
+     "dur": 1.8,
+     "in": 29.0,
+     "zoom": [
+      1.15,
+      1.22
+     ],
+     "center": [
+      0.45,
+      0.4
+     ],
+     "grade": "daylight",
+     "transition": "flash",
+     "tdur": 0.4,
+     "caption": {
+      "rows": [
+       "朝の光が、",
+       "うれしくなる。"
+      ],
+      "theme": "dark",
+      "pos": "upper"
+     }
+    }
+   ],
+   "fonts": {
+    "latin": "optima"
+   }
+  },
+  "motion": {
+   "taste": "motion",
+   "bpm": 138.5,
+   "hook": {
+    "lines": [
+     {
+      "text": "顔に鍼って、",
+      "style": "dark"
+     },
+     {
+      "text": "どんな感じ？",
+      "style": "gold"
+     }
+    ],
+    "shot": {
+     "clip": "IMG_2742.MOV",
+     "in": 2.85,
+     "speed": 0.5,
+     "zoom": [
+      1.4,
+      1.28
+     ],
+     "center": [
+      [
+       0.46,
+       0.36
+      ],
+      [
+       0.46,
+       0.35
+      ]
+     ],
+     "beats": 4
+    }
+   },
+   "steps": [
+    {
+     "title": "カウンセリング",
+     "sub": "お顔をじっくり確認",
+     "shot": {
+      "clip": "IMG_0996.MOV",
+      "in": 3.0,
+      "beats": 4,
+      "cam_beats": [
+       [
+        0,
+        1.36,
+        0.42,
+        0.5
+       ],
+       [
+        1.9,
+        1.4,
+        0.42,
+        0.5
+       ],
+       [
+        2.6,
+        1.8,
+        0.4,
+        0.5
+       ],
+       [
+        4,
+        1.86,
+        0.4,
+        0.5
+       ]
+      ],
+      "ring": {
+       "at": [
+        0.389,
+        0.495
+       ],
+       "r": 0.125,
+       "beat": 2.4
+      }
+     }
+    },
+    {
+     "title": "施術",
+     "sub": "横になって、おまかせ",
+     "beats": 8,
+     "shots": [
+      {
+       "clip": "IMG_2722.MOV",
+       "in": 1.0,
+       "speed": 0.5,
+       "zoom": [
+        1.25,
+        1.15
+       ],
+       "center": [
+        0.5,
+        0.42
+       ]
+      },
+      {
+       "clip": "IMG_2741.MOV",
+       "in": 0.12,
+       "speed": 0.5,
+       "zoom": [
+        1.42,
+        1.32
+       ],
+       "center": [
+        [
+         0.58,
+         0.37
+        ],
+        [
+         0.58,
+         0.36
+        ]
+       ]
+      },
+      {
+       "clip": "IMG_2722.MOV",
+       "in": 11.55,
+       "speed": 0.5,
+       "zoom": [
+        1.36,
+        1.26
+       ],
+       "center": [
+        [
+         0.42,
+         0.56
+        ],
+        [
+         0.42,
+         0.55
+        ]
+       ]
+      },
+      {
+       "clip": "IMG_2742.MOV",
+       "in": 3.6,
+       "speed": 0.5,
+       "zoom": [
+        1.48,
+        1.36
+       ],
+       "center": [
+        0.47,
+        0.38
+       ]
+      }
+     ]
+    },
+    {
+     "title": "ほっと、ひと息",
+     "badge_y": 0.644,
+     "shot": {
+      "clip": "IMG_2739.MOV",
+      "in": 5.15,
+      "speed": 0.5,
+      "zoom": [
+       1.12,
+       1.05
+      ],
+      "center": [
+       [
+        0.5,
+        0.5
+       ],
+       [
+        0.48,
+        0.49
+       ]
+      ],
+      "beats": 3
+     }
+    }
+   ],
+   "closing": {
+    "lines": [
+     {
+      "text": "がんばる毎日に、",
+      "style": "dark",
+      "size": 50,
+      "font": "goth6"
+     },
+     {
+      "text": "ごほうびを。",
+      "style": "gold",
+      "size": 92
+     }
+    ],
+    "y": 0.27,
+    "shot": {
+     "clip": "IMG_1444 2.mov",
+     "in": 8.2,
+     "zoom": [
+      1.4,
+      1.5
+     ],
+     "center": [
+      0.55,
+      0.42
+     ],
+     "beats": 3
+    }
+   },
+   "card": {
+    "beats": 8
+   }
+  },
+  "motion_20": {
+   "taste": "motion",
+   "duration": 20,
+   "hook": {
+    "lines": [
+     {
+      "text": "画面と、にらめっこの毎日。",
+      "style": "dark",
+      "size": 56
+     },
+     {
+      "text": "がんばる自分に、",
+      "style": "dark"
+     },
+     {
+      "text": "ごほうびの時間を。",
+      "style": "gold"
+     }
+    ],
+    "logo": "on_light",
+    "aspect": {
+     "4:5": {
+      "y": 0.4
+     },
+     "1:1": {
+      "y": 0.34
+     }
+    },
+    "shot": {
+     "clip": "IMG_1453 2.mov",
+     "in": 8.0,
+     "zoom": [
+      1.3,
+      1.42
+     ],
+     "center": [
+      0.5,
+      0.4
+     ],
+     "beats": 6
+    }
+   },
+   "steps": [
+    {
+     "title": "カウンセリング",
+     "sub": "お顔をじっくり確認",
+     "shot": {
+      "clip": "IMG_0996.MOV",
+      "in": 3.0,
+      "beats": 6,
+      "cam_beats": [
+       [
+        0,
+        1.36,
+        0.42,
+        0.5
+       ],
+       [
+        2.9,
+        1.4,
+        0.42,
+        0.5
+       ],
+       [
+        3.7,
+        1.8,
+        0.4,
+        0.5
+       ],
+       [
+        6,
+        1.86,
+        0.4,
+        0.5
+       ]
+      ],
+      "ring": {
+       "at": [
+        0.389,
+        0.495
+       ],
+       "r": 0.125,
+       "beat": 3.9
+      }
+     }
+    },
+    {
+     "title": "施術",
+     "sub": "横になって、おまかせ",
+     "beats": 12,
+     "shots": [
+      {
+       "clip": "IMG_2722.MOV",
+       "in": 1.0,
+       "speed": 0.5,
+       "zoom": [
+        1.25,
+        1.15
+       ],
+       "center": [
+        0.5,
+        0.42
+       ]
+      },
+      {
+       "clip": "IMG_2741.MOV",
+       "in": 0.12,
+       "speed": 0.5,
+       "zoom": [
+        1.42,
+        1.32
+       ],
+       "center": [
+        [
+         0.58,
+         0.37
+        ],
+        [
+         0.58,
+         0.36
+        ]
+       ]
+      },
+      {
+       "clip": "IMG_2722.MOV",
+       "in": 11.55,
+       "speed": 0.5,
+       "zoom": [
+        1.36,
+        1.26
+       ],
+       "center": [
+        [
+         0.42,
+         0.56
+        ],
+        [
+         0.42,
+         0.55
+        ]
+       ]
+      },
+      {
+       "clip": "IMG_2742.MOV",
+       "in": 3.6,
+       "speed": 0.5,
+       "zoom": [
+        1.48,
+        1.36
+       ],
+       "center": [
+        0.47,
+        0.38
+       ]
+      },
+      {
+       "clip": "IMG_2722.MOV",
+       "in": 24.3,
+       "speed": 0.5,
+       "zoom": [
+        1.35,
+        1.25
+       ],
+       "center": [
+        0.5,
+        0.45
+       ]
+      },
+      {
+       "clip": "IMG_2722.MOV",
+       "in": 36.5,
+       "speed": 0.5,
+       "zoom": [
+        1.3,
+        1.2
+       ],
+       "center": [
+        0.5,
+        0.5
+       ]
+      }
+     ]
+    },
+    {
+     "title": "ほっと、ひと息",
+     "badge_y": 0.644,
+     "shot": {
+      "clip": "IMG_2739.MOV",
+      "in": 5.15,
+      "speed": 0.5,
+      "zoom": [
+       1.12,
+       1.05
+      ],
+      "center": [
+       [
+        0.5,
+        0.5
+       ],
+       [
+        0.48,
+        0.49
+       ]
+      ],
+      "beats": 6
+     }
+    }
+   ],
+   "closing": {
+    "lines": [
+     {
+      "text": "がんばる毎日に、",
+      "style": "dark",
+      "size": 50,
+      "font": "goth6"
+     },
+     {
+      "text": "ごほうびを。",
+      "style": "gold",
+      "size": 92
+     }
+    ],
+    "shot": {
+     "clip": "IMG_1444 2.mov",
+     "in": 7.3,
+     "zoom": [
+      1.4,
+      1.5
+     ],
+     "center": [
+      0.55,
+      0.42
+     ],
+     "beats": 6
+    }
+   },
+   "card": {
+    "beats": 10
+   }
+  },
+  "cinematic": {
+   "taste": "cinematic",
+   "duration": 24,
+   "bgm": {
+    "style": "cinematic"
+   },
+   "shots": [
+    {
+     "name": "open",
+     "clip": "IMG_2742.MOV",
+     "in": 0.6,
+     "dur": 3.2,
+     "speed": 0.5,
+     "zoom": [
+      1.5,
+      1.4
+     ],
+     "center": [
+      [
+       0.4,
+       0.33
+      ],
+      [
+       0.4,
+       0.32
+      ]
+     ],
+     "aspect": {
+      "16:9": {
+       "fit": "cover",
+       "zoom": [
+        1.1,
+        1.0
+       ],
+       "center": [
+        [
+         0.42,
+         0.27
+        ],
+        [
+         0.42,
+         0.26
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "name": "counsel",
+     "clip": "IMG_0996.MOV",
+     "in": 1.6,
+     "dur": 3.2,
+     "zoom": [
+      1.36,
+      1.46
+     ],
+     "center": [
+      [
+       0.42,
+       0.5
+      ],
+      [
+       0.41,
+       0.5
+      ]
+     ],
+     "focus": [
+      0.3796,
+      0.5,
+      0.1574,
+      0.1898,
+      12
+     ],
+     "aspect": {
+      "16:9": {
+       "fit": "cover",
+       "zoom": [
+        1.05,
+        1.15
+       ],
+       "center": [
+        0.45,
+        0.52
+       ]
+      }
+     }
+    },
+    {
+     "name": "needle",
+     "clip": "IMG_2722.MOV",
+     "in": 0.85,
+     "dur": 3.2,
+     "speed": 0.5,
+     "zoom": [
+      1.32,
+      1.4
+     ],
+     "center": [
+      0.5,
+      0.5
+     ],
+     "aspect": {
+      "16:9": {
+       "fit": "cover",
+       "zoom": [
+        1.05,
+        1.15
+       ],
+       "center": [
+        0.4,
+        0.46
+       ]
+      }
+     }
+    },
+    {
+     "name": "wires",
+     "clip": "IMG_2741.MOV",
+     "in": 0.4,
+     "dur": 2.8,
+     "speed": 0.5,
+     "zoom": [
+      1.4,
+      1.3
+     ],
+     "center": [
+      [
+       0.58,
+       0.37
+      ],
+      [
+       0.58,
+       0.36
+      ]
+     ],
+     "aspect": {
+      "16:9": {
+       "fit": "cover",
+       "zoom": [
+        1.05,
+        1.0
+       ],
+       "center": [
+        [
+         0.56,
+         0.52
+        ],
+        [
+         0.56,
+         0.5
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "name": "halo",
+     "clip": "IMG_2741.MOV",
+     "in": 4.8,
+     "dur": 2.0,
+     "speed": 0.5,
+     "zoom": [
+      1.38,
+      1.3
+     ],
+     "center": [
+      [
+       0.45,
+       0.58
+      ],
+      [
+       0.45,
+       0.57
+      ]
+     ],
+     "soft_below": 0,
+     "patches": [
+      [
+       0.5556,
+       0.8802,
+       0.2407,
+       0.1389,
+       16
+      ]
+     ],
+     "aspect": {
+      "16:9": {
+       "fit": "cover",
+       "zoom": [
+        1.05,
+        1.0
+       ],
+       "center": [
+        [
+         0.45,
+         0.56
+        ],
+        [
+         0.45,
+         0.55
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "name": "smile",
+     "clip": "IMG_2739.MOV",
+     "in": 4.75,
+     "dur": 4.0,
+     "speed": 0.5,
+     "zoom": [
+      1.5,
+      1.42
+     ],
+     "center": [
+      [
+       0.4,
+       0.36
+      ],
+      [
+       0.41,
+       0.36
+      ]
+     ],
+     "aspect": {
+      "16:9": {
+       "fit": "cover",
+       "zoom": [
+        1.1,
+        1.0
+       ],
+       "center": [
+        0.6,
+        0.3
+       ]
+      }
+     }
+    },
+    {
+     "name": "light",
+     "clip": "IMG_1460 2.mov",
+     "in": 29.1,
+     "dur": 2.0,
+     "zoom": [
+      1.15,
+      1.1
+     ],
+     "center": [
+      0.45,
+      0.42
+     ],
+     "aspect": {
+      "16:9": {
+       "fit": "cover"
+      }
+     }
+    }
+   ],
+   "lines": [
+    {
+     "text": "ほどける。",
+     "shot": "open",
+     "at": 0.72
+    },
+    {
+     "text": "ととのう。",
+     "shot": "wires",
+     "at": 0.4
+    },
+    {
+     "text": "わたしに、還る。",
+     "shot": "light",
+     "at": 0.08,
+     "side": "left",
+     "color": "ink",
+     "top": 0.113,
+     "aspect": {
+      "4:5": {
+       "side": "right"
+      },
+      "1:1": {
+       "side": "right"
+      }
+     }
+    }
+   ],
+   "chapters": [
+    {
+     "num": "I",
+     "text": "静",
+     "shot": "counsel"
+    },
+    {
+     "num": "II",
+     "text": "整",
+     "shot": "wires"
+    },
+    {
+     "num": "III",
+     "text": "還",
+     "shot": "smile"
+    }
+   ]
+  },
+  "cinematic_15": {
+   "taste": "cinematic",
+   "duration": 15,
+   "xfade": 0.7,
+   "bgm": {
+    "style": "cinematic"
+   },
+   "shots": [
+    {
+     "name": "open",
+     "clip": "IMG_2742.MOV",
+     "in": 0.6,
+     "dur": 2.6,
+     "speed": 0.5,
+     "zoom": [
+      1.5,
+      1.4
+     ],
+     "center": [
+      [
+       0.4,
+       0.33
+      ],
+      [
+       0.4,
+       0.32
+      ]
+     ]
+    },
+    {
+     "name": "counsel",
+     "clip": "IMG_0996.MOV",
+     "in": 1.6,
+     "dur": 2.2,
+     "zoom": [
+      1.36,
+      1.46
+     ],
+     "center": [
+      [
+       0.42,
+       0.5
+      ],
+      [
+       0.41,
+       0.5
+      ]
+     ],
+     "focus": [
+      0.3796,
+      0.5,
+      0.1574,
+      0.1898,
+      12
+     ]
+    },
+    {
+     "name": "wires",
+     "clip": "IMG_2741.MOV",
+     "in": 0.4,
+     "dur": 2.4,
+     "speed": 0.5,
+     "zoom": [
+      1.4,
+      1.3
+     ],
+     "center": [
+      [
+       0.58,
+       0.37
+      ],
+      [
+       0.58,
+       0.36
+      ]
+     ]
+    },
+    {
+     "name": "smile",
+     "clip": "IMG_2739.MOV",
+     "in": 4.75,
+     "dur": 2.6,
+     "speed": 0.5,
+     "zoom": [
+      1.5,
+      1.42
+     ],
+     "center": [
+      [
+       0.4,
+       0.36
+      ],
+      [
+       0.41,
+       0.36
+      ]
+     ]
+    },
+    {
+     "name": "light",
+     "clip": "IMG_1460 2.mov",
+     "in": 29.1,
+     "dur": 2.0,
+     "zoom": [
+      1.15,
+      1.1
+     ],
+     "center": [
+      0.45,
+      0.42
+     ]
+    }
+   ],
+   "lines": [
+    {
+     "text": "ほどける。",
+     "shot": "open",
+     "at": 0.5
+    },
+    {
+     "text": "ととのう。",
+     "shot": "wires",
+     "at": 0.3
+    },
+    {
+     "text": [
+      "わたしに、",
+      "還る。"
+     ],
+     "shot": "light",
+     "at": 0.1,
+     "until": -0.1,
+     "side": "left",
+     "color": "ink",
+     "top": 0.113,
+     "aspect": {
+      "4:5": {
+       "side": "right"
+      },
+      "1:1": {
+       "side": "right"
+      }
+     }
+    }
+   ],
+   "chapters": [
+    {
+     "num": "I",
+     "text": "静",
+     "shot": "counsel",
+     "at": 0.2
+    },
+    {
+     "num": "II",
+     "text": "整",
+     "shot": "wires",
+     "at": 0.2
+    },
+    {
+     "num": "III",
+     "text": "還",
+     "shot": "smile",
+     "at": 0.2
+    }
+   ]
+  },
+  "vlog": {
+   "taste": "vlog",
+   "title": "美容鍼に行ってきた日",
+   "duration": 24,
+   "start": 0.3,
+   "gaps": [
+    0.3,
+    0.38,
+    0.25,
+    0.4,
+    0.3,
+    0.35,
+    0.35,
+    0.28
+   ],
+   "lead": 0.18,
+   "voice": {
+    "engine": "aivis",
+    "speaker": 497929760,
+    "speed": 1.0,
+    "tempo": 1.15,
+    "aliases": {
+     "見本": "ミホン"
+    }
+   },
+   "bgm": {
+    "style": "lofi"
+   },
+   "lines": [
+    {
+     "sub": [
+      "今日は、ずっと気になってた",
+      "美容鍼の日。"
+     ],
+     "speech": "今日は、ずっと気になってた、びようばりの日。",
+     "chip": "AM 9:00",
+     "shot": {
+      "clip": "IMG_1460 2.mov",
+      "in": 1.1,
+      "zoom": [
+       1.12,
+       1.18
+      ],
+      "center": [
+       0.45,
+       0.45
+      ],
+      "shake": 7
+     }
+    },
+    {
+     "sub": [
+      "午前中は、画面とにらめっこ。"
+     ],
+     "speech": "午前中は、画面とにらめっこ。",
+     "chip": "AM 11:00",
+     "shot": {
+      "clip": "IMG_1446 2.mov",
+      "in": 0.4,
+      "zoom": [
+       1.15,
+       1.22
+      ],
+      "center": [
+       0.55,
+       0.36
+      ],
+      "shake": 7
+     }
+    },
+    {
+     "sub": [
+      "午後は、サロンへ。"
+     ],
+     "speech": "午後は、サロンへ。",
+     "chip": "PM 2:00",
+     "shot": {
+      "clip": "IMG_0996.MOV",
+      "in": 1.0,
+      "zoom": [
+       1.3,
+       1.36
+      ],
+      "center": [
+       0.42,
+       0.56
+      ]
+     }
+    },
+    {
+     "sub": [
+      "まずはカウンセリングで、",
+      "顔のことをじっくり相談。"
+     ],
+     "speech": "まずはカウンセリングで、顔のことをじっくり相談。",
+     "shot": {
+      "clip": "IMG_0996.MOV",
+      "in": 5.0,
+      "zoom": [
+       1.62,
+       1.7
+      ],
+      "center": [
+       0.4,
+       0.56
+      ]
+     }
+    },
+    {
+     "sub": [
+      "横になったら、あとはおまかせ。"
+     ],
+     "speech": "横になったら、あとはおまかせ。",
+     "shot": {
+      "clip": "IMG_2722.MOV",
+      "in": 0.85,
+      "speed": 0.5,
+      "zoom": [
+       1.15,
+       1.22
+      ],
+      "center": [
+       0.5,
+       0.42
+      ]
+     }
+    },
+    {
+     "sub": [
+      "しずかで、ゆったりした時間。"
+     ],
+     "speech": "しずかで、ゆったりした時間。",
+     "sub_pos": 0.256,
+     "shot": {
+      "clip": "IMG_2742.MOV",
+      "in": 2.6,
+      "speed": 0.5,
+      "zoom": [
+       1.42,
+       1.32
+      ],
+      "center": [
+       0.46,
+       0.36
+      ]
+     }
+    },
+    {
+     "sub": [
+      "終わるころには、思わず笑顔。"
+     ],
+     "speech": "終わるころには、思わず笑顔。",
+     "shot": {
+      "clip": "IMG_2739.MOV",
+      "in": 5.1,
+      "speed": 0.5,
+      "zoom": [
+       1.1,
+       1.04
+      ],
+      "center": [
+       0.48,
+       0.48
+      ]
+     }
+    },
+    {
+     "sub": [
+      "がんばる自分への、",
+      "ちいさなごほうび。"
+     ],
+     "speech": "がんばる自分への、ちいさなごほうび。",
+     "chip": "PM 5:00",
+     "shot": {
+      "clip": "IMG_1444 2.mov",
+      "in": 7.05,
+      "zoom": [
+       1.48,
+       1.54
+      ],
+      "center": [
+       0.55,
+       0.52
+      ],
+      "shake": 7
+     }
+    },
+    {
+     "sub": [
+      "ご予約はリンクから。"
+     ],
+     "speech": "ご予約は、リンクから。",
+     "card": true
+    }
+   ]
+  },
+  "chat": {
+   "taste": "chat",
+   "title": "あや",
+   "banner": "美容鍼、気になってた？",
+   "clock": "20:41",
+   "start": 0.25,
+   "zoom_gap": 1.1,
+   "hold": 3.15,
+   "note": true,
+   "end": {
+    "tagline": "気になってたなら、いまが行きどき。",
+    "theme": "light",
+    "cta_style": "solid"
+   },
+   "beside": {
+    "tagline": "がんばる自分に、ごほうびを。"
+   },
+   "bgm": {
+    "style": "lofi"
+   },
+   "messages": [
+    {
+     "t": 0.25,
+     "side": "L",
+     "kind": "video",
+     "dur": 2.4,
+     "shot": {
+      "clip": "IMG_2742.MOV",
+      "in": 2.85,
+      "speed": 0.5,
+      "zoom": [
+       1.45,
+       1.3775
+      ],
+      "center": [
+       0.46,
+       0.38
+      ],
+      "grade": "beauty",
+      "soft_below": 0.63
+     }
+    },
+    {
+     "t": 1.1,
+     "side": "L",
+     "text": "美容鍼いってきた〜！"
+    },
+    {
+     "t": 2.0,
+     "side": "R",
+     "text": "顔に鍼！？"
+    },
+    {
+     "t": 2.5,
+     "side": "R",
+     "kind": "sticker",
+     "text": "えっ！？",
+     "face": "surprised"
+    },
+    {
+     "t": 3.4,
+     "side": "R",
+     "text": "痛くないの…？"
+    },
+    {
+     "t": 3.95,
+     "side": "L",
+     "kind": "typing",
+     "dur": 0.6
+    },
+    {
+     "t": 4.55,
+     "side": "L",
+     "text": "最初のカウンセリングで\nいろいろ相談できたから\n安心だったよ"
+    },
+    {
+     "t": 5.55,
+     "side": "L",
+     "kind": "video",
+     "dur": 2.2,
+     "shot": {
+      "clip": "IMG_0996.MOV",
+      "in": 4.0,
+      "zoom": [
+       1.55,
+       1.4725
+      ],
+      "center": [
+       0.4,
+       0.52
+      ],
+      "grade": "natural"
+     }
+    },
+    {
+     "t": 6.85,
+     "side": "R",
+     "text": "ちゃんと話を聞いて\nくれるのいいね"
+    },
+    {
+     "t": 7.45,
+     "side": "L",
+     "kind": "typing",
+     "dur": 0.5
+    },
+    {
+     "t": 7.95,
+     "side": "L",
+     "text": "あとは横になってるだけ〜"
+    },
+    {
+     "t": 8.55,
+     "side": "L",
+     "kind": "video",
+     "dur": 2.0,
+     "shot": {
+      "clip": "IMG_2741.MOV",
+      "in": 0.12,
+      "speed": 0.5,
+      "zoom": [
+       1.4,
+       1.33
+      ],
+      "center": [
+       0.58,
+       0.37
+      ],
+      "grade": "beauty",
+      "soft_below": 0.61
+     }
+    },
+    {
+     "t": 9.75,
+     "side": "L",
+     "text": "しずかで、ゆったりできた"
+    },
+    {
+     "t": 10.55,
+     "side": "L",
+     "kind": "video",
+     "dur": 2.2,
+     "shot": {
+      "clip": "IMG_2739.MOV",
+      "in": 5.15,
+      "speed": 0.5,
+      "zoom": [
+       1.45,
+       1.3775
+      ],
+      "center": [
+       0.4,
+       0.36
+      ],
+      "grade": "beauty"
+     }
+    },
+    {
+     "t": 11.4,
+     "side": "L",
+     "text": "楽しんでる私w"
+    },
+    {
+     "t": 12.15,
+     "side": "R",
+     "text": "なんか楽しそうw"
+    },
+    {
+     "t": 12.7,
+     "side": "R",
+     "kind": "sticker",
+     "text": "いいな〜",
+     "face": "happy"
+    },
+    {
+     "t": 13.6,
+     "side": "R",
+     "text": "私も行ってみたい！"
+    },
+    {
+     "t": 14.1,
+     "side": "L",
+     "kind": "typing",
+     "dur": 0.45
+    },
+    {
+     "t": 14.55,
+     "side": "L",
+     "text": "予約リンク送るね！"
+    },
+    {
+     "t": 15.15,
+     "side": "L",
+     "kind": "link",
+     "title": "SALON SAMPLE｜美容鍼のご予約",
+     "sub": "ご予約はこちらから"
+    },
+    {
+     "t": 16.15,
+     "side": "R",
+     "text": "ありがと！さっそく予約する！"
+    }
+   ]
+  },
+  "chat_short": {
+   "taste": "chat",
+   "title": "あや",
+   "banner": "美容鍼、気になってた？",
+   "duration": 13,
+   "end": {
+    "tagline": "気になってたなら、いまが行きどき。",
+    "theme": "light",
+    "cta_style": "solid"
+   },
+   "beside": {
+    "tagline": "がんばる自分に、ごほうびを。"
+   },
+   "bgm": {
+    "style": "lofi"
+   },
+   "messages": [
+    {
+     "side": "L",
+     "kind": "video",
+     "dur": 2.2,
+     "shot": {
+      "clip": "IMG_2742.MOV",
+      "in": 2.85,
+      "speed": 0.5,
+      "zoom": [
+       1.45,
+       1.3775
+      ],
+      "center": [
+       0.46,
+       0.38
+      ],
+      "grade": "beauty",
+      "soft_below": 0.63
+     }
+    },
+    {
+     "side": "L",
+     "text": "美容鍼いってきた〜！"
+    },
+    {
+     "side": "R",
+     "kind": "sticker",
+     "text": "えっ！？"
+    },
+    {
+     "side": "L",
+     "kind": "typing"
+    },
+    {
+     "side": "L",
+     "text": "カウンセリングで\n相談できて安心だったよ"
+    },
+    {
+     "side": "R",
+     "text": "いいな〜！私も行きたい！"
+    },
+    {
+     "side": "L",
+     "text": "予約リンク送るね！"
+    },
+    {
+     "side": "L",
+     "kind": "link",
+     "title": "SALON SAMPLE｜美容鍼のご予約",
+     "sub": "ご予約はこちらから"
+    },
+    {
+     "side": "R",
+     "text": "ありがと！"
+    }
+   ]
+  },
+  "chat_options": {
+   "taste": "chat",
+   "title": "みなみ",
+   "avatar": "み",
+   "banner": false,
+   "clock": "9:58",
+   "minute_every": 3,
+   "note": "※個人の感想です",
+   "palette": {
+    "wall": "#E9D8D2",
+    "mine": "#F7C6D0"
+   },
+   "zoom": false,
+   "hold": 3.0,
+   "cta": "LINEで予約する",
+   "end": {
+    "tagline": "あなたも、はじめてみませんか。",
+    "theme": "dark",
+    "cta_style": "outline",
+    "note": "ご予約受付中"
+   },
+   "beside": {
+    "tagline": "つぎは、あなたの番。"
+   },
+   "messages": [
+    {
+     "side": "L",
+     "text": "ここの美容鍼、ほんとによかった！おすすめだよ"
+    },
+    {
+     "side": "R",
+     "kind": "sticker",
+     "text": "気になる〜",
+     "face": "love"
+    },
+    {
+     "side": "R",
+     "text": "どんな感じ？"
+    },
+    {
+     "side": "L",
+     "kind": "video",
+     "dur": 2.0,
+     "shot": {
+      "clip": "IMG_2739.MOV",
+      "in": 5.15,
+      "speed": 0.5,
+      "zoom": [
+       1.45,
+       1.38
+      ],
+      "center": [
+       0.4,
+       0.36
+      ],
+      "grade": "soft"
+     }
+    },
+    {
+     "side": "L",
+     "kind": "typing",
+     "dur": 1.0
+    },
+    {
+     "side": "L",
+     "text": "終わったあと、ほっとひと息。"
+    },
+    {
+     "side": "R",
+     "text": "いく！！",
+     "gap": 0.4
+    },
+    {
+     "side": "L",
+     "kind": "link"
+    }
+   ]
+  }
+ }
+}
