@@ -1,4 +1,4 @@
-"""Audio chain of content-video: the voice cut like the picture, original BGM, SFX sets, the mix and its mastering.
+"""Audio chain of buzz-video-content: the voice cut like the picture, original BGM, SFX sets, the mix and its mastering.
 
   voice.py   source audio -> dialogue / ambience tracks on the output timeline (Rubber Band, EQ, denoise only if noisy)
   music.py   BGM for 15 s - 20 min: form.py (plan) + style_<lofi|acoustic|pop|wa|ambient|piano>.py (+ theory, melody,

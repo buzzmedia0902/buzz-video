@@ -8,7 +8,7 @@ style and the SFX sets are built from.
   strings    nylon_guitar (Karplus-Strong), marimba
   drums      kick, snare, clap, hat, shaker, snap, brush_hit
   fx         swish, riser, impact, rev_cymbal, bubble_pop, tick, glide_tone, sticker_wobble, key_tap, vinyl, wow, autopan
-Ported from sns-ad-video's core/synth.py (DSP unchanged) plus the guitar / marimba / snap voices. Cached instrument
+Ported from buzz-video-ad's core/synth.py (DSP unchanged) plus the guitar / marimba / snap voices. Cached instrument
 functions return read-only arrays: copy before modifying in place.
 """
 from __future__ import annotations

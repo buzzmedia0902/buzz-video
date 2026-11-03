@@ -1,5 +1,5 @@
 #!/bin/bash
-# One-time setup of this Mac for content-video. Safe to run again: it only adds what is missing.
+# One-time setup of this Mac for buzz-video-content. Safe to run again: it only adds what is missing.
 #   bash setup.sh           install what is missing (Homebrew formulas, free fonts, the ~550 MB Whisper model)
 #   bash setup.sh --check   report only
 # Needs macOS (Apple Vision, VideoToolbox) and Homebrew (https://brew.sh).
@@ -15,7 +15,7 @@ ok()  { echo "ok   $*"; }
 ng()  { echo "NG   $*"; FAILED=1; }
 opt() { echo "--   $*"; }
 
-[ "$(uname -s)" = "Darwin" ] || { echo "content-video は macOS 専用です（Apple Vision と VideoToolbox を使います）"; exit 1; }
+[ "$(uname -s)" = "Darwin" ] || { echo "buzz-video-content は macOS 専用です（Apple Vision と VideoToolbox を使います）"; exit 1; }
 command -v brew >/dev/null || for b in /opt/homebrew/bin/brew /usr/local/bin/brew; do
   [ -x "$b" ] && eval "$("$b" shellenv)" && break  # Homebrew is often missing from PATH in non-login shells
 done
@@ -82,4 +82,4 @@ if [ -n "$PY" ]; then
 fi
 opt "話者の判定（speakers.py）を初めて使うときは、別のPython環境（約2GB）が自動で作られます"
 
-if [ $FAILED = 0 ]; then echo "content-video: 準備できました"; else echo "content-video: NG の項目を入れてから、もう一度実行してください"; exit 1; fi
+if [ $FAILED = 0 ]; then echo "buzz-video-content: 準備できました"; else echo "buzz-video-content: NG の項目を入れてから、もう一度実行してください"; exit 1; fi

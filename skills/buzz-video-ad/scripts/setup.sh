@@ -1,5 +1,5 @@
 #!/bin/bash
-# One-time setup of this Mac for sns-ad-video. Safe to run again: it only adds what is missing.
+# One-time setup of this Mac for buzz-video-ad. Safe to run again: it only adds what is missing.
 #   bash setup.sh           install what is missing (Homebrew formulas, the ~550 MB Whisper model for the
 #                           narration listen-check)
 #   bash setup.sh --check   report only
@@ -15,7 +15,7 @@ ok()  { echo "ok   $*"; }
 ng()  { echo "NG   $*"; FAILED=1; }
 opt() { echo "--   $*"; }
 
-[ "$(uname -s)" = "Darwin" ] || { echo "sns-ad-video は macOS 専用です"; exit 1; }
+[ "$(uname -s)" = "Darwin" ] || { echo "buzz-video-ad は macOS 専用です"; exit 1; }
 command -v brew >/dev/null || for b in /opt/homebrew/bin/brew /usr/local/bin/brew; do
   [ -x "$b" ] && eval "$("$b" shellenv)" && break  # Homebrew is often missing from PATH in non-login shells
 done
@@ -72,4 +72,4 @@ else
   opt "ナレーションの音声エンジンなし（Vlogテイストのナレーションを使うときだけ必要。README の「ナレーション」を参照）"
 fi
 
-if [ $FAILED = 0 ]; then echo "sns-ad-video: 準備できました"; else echo "sns-ad-video: NG の項目を入れてから、もう一度実行してください"; exit 1; fi
+if [ $FAILED = 0 ]; then echo "buzz-video-ad: 準備できました"; else echo "buzz-video-ad: NG の項目を入れてから、もう一度実行してください"; exit 1; fi

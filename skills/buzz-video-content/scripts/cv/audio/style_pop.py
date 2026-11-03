@@ -2,7 +2,7 @@
 
 Per beat: kick on every beat (side-chains bass and chords), claps on 2 & 4, off-beat hats, 16th shaker; a break
 (kick / clap / hat out) appears now and then. The build is a rising pluck run, snare roll, riser and reverse cymbal;
-the landing is a big kick + impact + bell chime, then the groove thins out. Ported from sns-ad-video's pop composer,
+the landing is a big kick + impact + bell chime, then the groove thins out. Ported from buzz-video-ad's pop composer,
 re-planned for any length (blocks, chunks) and card swells.
 """
 from __future__ import annotations

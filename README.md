@@ -6,8 +6,8 @@
 
 | スキル | 作れるもの |
 |---|---|
-| **content-video**（発信動画） | YouTube本編（横）、ショート・リール・TikTok（縦）、長い動画からの切り抜き、日常Vlog |
-| **sns-ad-video**（広告動画） | 店舗・サロン・クリニック・飲食店などの SNS 広告・リール（9:16 / 4:5 / 1:1 / 16:9） |
+| **buzz-video-content**（発信動画） | YouTube本編（横）、ショート・リール・TikTok（縦）、長い動画からの切り抜き、日常Vlog |
+| **buzz-video-ad**（広告動画） | 店舗・サロン・クリニック・飲食店などの SNS 広告・リール（9:16 / 4:5 / 1:1 / 16:9） |
 
 ## 特徴
 - **最初に選択式で質問**します。用途・トンマナ・比率・長さを選ぶだけで、編集の方針が決まります。参考動画を渡すと、カットの間隔・話す速さ・テロップの位置を測って寄せます。
@@ -37,8 +37,8 @@ Claude Code で次の2行を実行します。
 ```bash
 git clone https://github.com/buzzmedia0902/buzz-video.git ~/buzz-video
 mkdir -p ~/.claude/skills
-ln -sfn ~/buzz-video/skills/content-video ~/.claude/skills/content-video
-ln -sfn ~/buzz-video/skills/sns-ad-video ~/.claude/skills/sns-ad-video
+ln -sfn ~/buzz-video/skills/buzz-video-content ~/.claude/skills/buzz-video-content
+ln -sfn ~/buzz-video/skills/buzz-video-ad ~/.claude/skills/buzz-video-ad
 ```
 
 ### 初回のセットアップ
@@ -59,7 +59,7 @@ macOS に付いているフォントのうち、筑紫丸ゴシック・凸版�
 
 Claude は素材を見てから選択式で質問し、静止画で確認しながら構成を詰めます。最初の1本ができたら、スマホで見られる軽量版を先に共有します。
 
-プラグインとして入れた場合は、`/buzz-video:content-video`・`/buzz-video:sns-ad-video` で直接呼び出すこともできます。
+プラグインとして入れた場合は、`/buzz-video:buzz-video-content`・`/buzz-video:buzz-video-ad` で直接呼び出すこともできます。
 
 ## ナレーション（任意。広告の Vlog テイスト）
 日本語の読み上げには、手元で動く音声エンジンを使います。
@@ -75,7 +75,7 @@ Claude は素材を見てから選択式で質問し、静止画で確認しな�
 - LINE は第三者の商標です。このプロジェクトは LINE とは関係ありません。
 
 ## 仕組み（開発する人へ）
-Claude が構成表（`edit.json` / `project.json`）を書き、Python のエンジン（skia・Pillow・numpy）と ffmpeg が1コマずつ描画します。BGM は numpy で作曲します。各スキルの `SKILL.md` が手順、`references/` が詳しい決まり、`scripts/` がエンジンです。content-video の内部構成は [scripts/DEV.md](skills/content-video/scripts/DEV.md) にあります。
+Claude が構成表（`edit.json` / `project.json`）を書き、Python のエンジン（skia・Pillow・numpy）と ffmpeg が1コマずつ描画します。BGM は numpy で作曲します。各スキルの `SKILL.md` が手順、`references/` が詳しい決まり、`scripts/` がエンジンです。buzz-video-content の内部構成は [scripts/DEV.md](skills/buzz-video-content/scripts/DEV.md) にあります。
 
 ## ライセンス
 MIT License（[LICENSE](LICENSE)）© 2026 BUZZ MEDIA

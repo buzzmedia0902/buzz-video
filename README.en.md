@@ -6,8 +6,8 @@
 
 | Skill | What it makes |
 |---|---|
-| **content-video** | YouTube videos (16:9), Shorts / Reels / TikTok (9:16), clips cut from long videos, everyday vlogs |
-| **sns-ad-video** | Social ads and Reels for shops, salons, clinics and restaurants (9:16 / 4:5 / 1:1 / 16:9) |
+| **buzz-video-content** | YouTube videos (16:9), Shorts / Reels / TikTok (9:16), clips cut from long videos, everyday vlogs |
+| **buzz-video-ad** | Social ads and Reels for shops, salons, clinics and restaurants (9:16 / 4:5 / 1:1 / 16:9) |
 
 ## Features
 - **Asks first, with multiple-choice questions**: use, tone, aspect ratio and length. Give it a reference video and it measures cut rate, speaking pace and caption placement, then matches them.
@@ -36,8 +36,8 @@
 ```bash
 git clone https://github.com/buzzmedia0902/buzz-video.git ~/buzz-video
 mkdir -p ~/.claude/skills
-ln -sfn ~/buzz-video/skills/content-video ~/.claude/skills/content-video
-ln -sfn ~/buzz-video/skills/sns-ad-video ~/.claude/skills/sns-ad-video
+ln -sfn ~/buzz-video/skills/buzz-video-content ~/.claude/skills/buzz-video-content
+ln -sfn ~/buzz-video/skills/buzz-video-ad ~/.claude/skills/buzz-video-ad
 ```
 
 ### First-time setup
@@ -52,7 +52,7 @@ Some fonts that come with macOS (Tsukushi Round Gothic, Toppan Bunkyu Midashi, K
 ## Use
 Tell Claude where the footage is, for example "edit ~/Movies/talk.mov for YouTube", "make three Shorts from this video" or "make a Reels ad from these clips and our logo". Claude looks at the footage, asks its questions, checks stills, and shares a light copy of the first video before finishing the rest.
 
-As a plugin, the skills can also be called as `/buzz-video:content-video` and `/buzz-video:sns-ad-video`.
+As a plugin, the skills can also be called as `/buzz-video:buzz-video-content` and `/buzz-video:buzz-video-ad`.
 
 ## Narration (optional, ad vlog taste)
 - Uses a local Japanese TTS engine: put the macOS build of [AivisSpeech Engine](https://github.com/Aivis-Project/AivisSpeech-Engine) or [VOICEVOX Engine](https://github.com/VOICEVOX/voicevox_engine) in `~/.local/opt/aivisspeech_engine-<version>/` or `~/.local/opt/voicevox_engine-<version>/` (the folder that holds `run`).
@@ -67,7 +67,7 @@ As a plugin, the skills can also be called as `/buzz-video:content-video` and `/
 - LINE is a third-party trademark. This project is not affiliated with LINE.
 
 ## How it works
-Claude writes an edit list (`edit.json` / `project.json`); a Python engine (skia, Pillow, numpy) and ffmpeg draw every frame, and numpy composes the music. Each skill's `SKILL.md` is the workflow, `references/` holds the detailed rules and `scripts/` is the engine. See [scripts/DEV.md](skills/content-video/scripts/DEV.md) for content-video's internals.
+Claude writes an edit list (`edit.json` / `project.json`); a Python engine (skia, Pillow, numpy) and ffmpeg draw every frame, and numpy composes the music. Each skill's `SKILL.md` is the workflow, `references/` holds the detailed rules and `scripts/` is the engine. See [scripts/DEV.md](skills/buzz-video-content/scripts/DEV.md) for buzz-video-content's internals.
 
 ## License
 MIT License ([LICENSE](LICENSE)) © 2026 BUZZ MEDIA

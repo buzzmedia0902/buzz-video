@@ -1,7 +1,7 @@
 """Output canvas of the version being rendered: size per aspect ratio, frame rate, text-safe area.
 
 render.py / finish.py set CV_ASPECT and CV_FPS before importing anything that draws, so every module can use
-the module-level W, H, FPS (same pattern as sns-ad-video).
+the module-level W, H, FPS (same pattern as buzz-video-ad).
 """
 from __future__ import annotations
 

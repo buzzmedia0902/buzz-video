@@ -2,7 +2,7 @@
 
 Sparse intro -> arpeggiated groove with a sung-like melody -> brighter b blocks -> a rising arpeggio over a pre-dominant
 and V build with a noise swell -> tonic 9th chord, FM bell chime and a sparkle on the landing, then the piano settles on
-a short falling figure while the hall rings out. Ported from sns-ad-video's piano composer, re-planned for any length.
+a short falling figure while the hall rings out. Ported from buzz-video-ad's piano composer, re-planned for any length.
 """
 from __future__ import annotations
 

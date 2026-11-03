@@ -1,4 +1,4 @@
-"""Frame compositor for sns-ad-video.
+"""Frame compositor for buzz-video-ad.
 
 Shots and sources with aspect-aware framing (cover or blurred fill), clean-up (blur patches, portrait
 focus, soft bottom band), colour grading and light effects.

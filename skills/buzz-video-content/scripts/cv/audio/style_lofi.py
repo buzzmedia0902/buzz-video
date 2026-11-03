@@ -3,7 +3,7 @@
 Rootless 9th / 13th voicings with smooth voice leading; swung 16ths (60 %); drums come in after the intro, drop to
 hats in a break and stop for the last beat before the landing. The bed keeps 1-4 kHz calm (EP low-passed at 3 kHz,
 snare low-passed) so a voice can sit on top. The landing is a soft kick, the tonic 9th chord and a light bell.
-Ported from sns-ad-video's lofi composer, re-planned for any length (blocks, chunks) and card swells.
+Ported from buzz-video-ad's lofi composer, re-planned for any length (blocks, chunks) and card swells.
 """
 from __future__ import annotations
 
