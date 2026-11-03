@@ -44,4 +44,4 @@
 ## アップロード（頼まれたときだけ）
 - Googleドライブ：rclone（`rclone copy` → `rclone check` で一致を確認）。共有設定はユーザーが行う。
 - ギガファイル便：大きいファイルの受け渡し。削除キーはチャットに書かない。
-- 方法の詳細は sns-ad-video スキルの references/delivery.md と同じ。
+- 方法の詳細は buzz-video-ad スキルの references/delivery.md と同じ。

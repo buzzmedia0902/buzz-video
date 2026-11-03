@@ -1,5 +1,5 @@
 #!/bin/bash
-# Ensure the Python environment for sns-ad-video exists and print its python path.
+# Ensure the Python environment for buzz-video-ad exists and print its python path.
 #   PY=$(bash <skill>/scripts/env.sh)          -> python path
 #   bash <skill>/scripts/env.sh --check         -> also report external tools (setup.sh installs them)
 set -euo pipefail

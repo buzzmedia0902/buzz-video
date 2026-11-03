@@ -1,5 +1,5 @@
 #!/bin/bash
-# Ensure the Python environment for content-video exists and print its python path.
+# Ensure the Python environment for buzz-video-content exists and print its python path.
 #   PY=$(bash <skill>/scripts/env.sh)            -> python path
 #   bash <skill>/scripts/env.sh --check           -> also report external tools (setup.sh installs them)
 #   SPK=$(bash <skill>/scripts/env.sh --speakers) -> python of the speaker-ID env (torch, ~2 GB)

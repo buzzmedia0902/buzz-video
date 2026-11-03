@@ -1,4 +1,4 @@
-# content-video engine (for maintainers and helper agents)
+# buzz-video-content engine (for maintainers and helper agents)
 
 Pipeline: `edit.json` -> `render.py` (silent master, stills, sheets; writes `work/<version>/cues_out.json`)
 -> `finish.py` (voice cut like the picture, BGM, SFX, mix -14 LUFS, mux, light copy, SRT, 概要欄, report).
