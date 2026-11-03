@@ -3,6 +3,9 @@
 #   PY=$(bash <skill>/scripts/env.sh)          -> python path
 #   bash <skill>/scripts/env.sh --check         -> also report external tools (setup.sh installs them)
 set -euo pipefail
+command -v brew >/dev/null || for b in /opt/homebrew/bin/brew /usr/local/bin/brew; do
+  [ -x "$b" ] && eval "$("$b" shellenv)" && break  # Homebrew is often missing from PATH in non-login shells (e.g. the desktop app)
+done
 VENV="${SNS_AD_VENV:-$HOME/.local/share/sns-ad-video/venv}"
 PKGS="numpy scipy pillow"
 if [ ! -x "$VENV/bin/python" ]; then
@@ -13,6 +16,16 @@ fi
 if ! "$VENV/bin/python" -c "import numpy, scipy, PIL" 2>/dev/null; then
   uv pip install --python "$VENV/bin/python" $PKGS >&2
 fi
+# Let scripts find Homebrew tools (ffmpeg, whisper-cli, ...) even when the calling shell lacks them on PATH
+SITE="$("$VENV/bin/python" -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])')/sitecustomize.py"
+[ -f "$SITE" ] || cat > "$SITE" <<'PYEOF'
+import os
+_p = os.environ.get("PATH", "").split(os.pathsep)
+for _d in ("/usr/local/bin", "/opt/homebrew/bin"):
+    if os.path.isdir(_d) and _d not in _p:
+        _p.insert(0, _d)
+os.environ["PATH"] = os.pathsep.join(_p)
+PYEOF
 if [ "${1:-}" = "--check" ]; then
   for t in ffmpeg ffprobe; do command -v $t >/dev/null && echo "ok   $t" >&2 || echo "NG   $t（必須: brew install ffmpeg）" >&2; done
   command -v rubberband >/dev/null && echo "ok   rubberband（ナレーションの速度調整）" >&2 || echo "--   rubberband なし（ナレーション速度は TTS 側で調整）" >&2
