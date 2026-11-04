@@ -178,7 +178,7 @@ def typeface(family: str, weight: int) -> skia.Typeface:
     style = skia.FontStyle(weight, skia.FontStyle.kNormal_Width, skia.FontStyle.kUpright_Slant)
     tf = _FM.matchFamilyStyle(name, style)
     if tf is None:
-        for alt in [*ALTERNATES.get(family, []), *FALLBACKS]:
+        for alt in [*(ALTERNATES.get(family, []) if os.name == "nt" else []), *FALLBACKS]:
             tf = _FM.matchFamilyStyle(alt, style)
             if tf is not None:
                 print(f"[gfx] font {name!r} not found, using {alt}", flush=True)

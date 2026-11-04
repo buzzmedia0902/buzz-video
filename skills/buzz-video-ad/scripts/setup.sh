@@ -5,7 +5,7 @@
 #   bash setup.sh --check   report only
 # Needs macOS and Homebrew (https://brew.sh). Narration engines are optional (see the README).
 set -uo pipefail
-HERE="$(cd "$(dirname "$0")" && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]//\\//}")" && pwd)"   # backslashes: called from Windows Python
 MODEL="$HOME/.local/share/whisper/ggml-large-v3-turbo-q5_0.bin"
 MODEL_URL="https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1/ggml-large-v3-turbo-q5_0.bin"
 MODEL_SHA256="394221709cd5ad1f40c46e6031ca61bce88931e6e088c188294c6d5a55ffa7e2"
@@ -40,14 +40,14 @@ tool whisper-cpp whisper-cli 0 "ナレーションの聞き取り確認"
 PY=""
 VENV="${SNS_AD_VENV:-$HOME/.local/share/sns-ad-video/venv}"
 if [ $CHECK = 1 ]; then  # report only: do not create the env
-  if "$(venv_python "$VENV")" -c "\1" 2>/dev/null; then PY="$(venv_python "$VENV")"; ok "Python環境（$PY）"
+  if "$(venv_python "$VENV")" -c "import numpy, scipy, PIL" 2>/dev/null; then PY="$(venv_python "$VENV")"; ok "Python環境（${PY}）"
   else ng "Python環境がない（bash setup.sh で作る）"; fi
 elif ! command -v uv >/dev/null; then ng "Python環境（uv が必要）"
-elif PY=$(bash "$HERE/env.sh"); then ok "Python環境（$PY）"
+elif PY=$(bash "$HERE/env.sh"); then ok "Python環境（${PY}）"
 else PY=""; ng "Python環境を作れなかった（上のエラーを確認）"; fi
 
 if [ -f "$MODEL" ]; then
-  ok "Whisperモデル（$MODEL）"
+  ok "Whisperモデル（${MODEL}）"
 elif [ $CHECK = 0 ] && command -v whisper-cli >/dev/null; then
   echo "..   Whisperモデルをダウンロード（約550MB）"
   mkdir -p "$(dirname "$MODEL")"

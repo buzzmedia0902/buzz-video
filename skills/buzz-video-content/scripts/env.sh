@@ -2,11 +2,11 @@
 # Ensure the Python environment for buzz-video-content exists and print its python path (macOS, or Git Bash on Windows).
 #   PY=$(bash <skill>/scripts/env.sh)            -> python path
 #   bash <skill>/scripts/env.sh --check           -> also report external tools (setup.sh installs them)
-#   SPK=$(bash <skill>/scripts/env.sh --speakers) -> python of the speaker-ID env (torch, ~2 GB)
+#   SPK=$(bash <skill>/scripts/env.sh --speakers) -> python of the speaker-ID env (torch, ~2 GB; native path)
 #   VIS=$(bash <skill>/scripts/env.sh --vision)   -> python of the MediaPipe/RapidOCR env (used where Apple Vision is
 #                                                    missing; a native path, for subprocess calls from Python)
 set -euo pipefail
-HERE="$(cd "$(dirname "$0")" && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]//\\//}")" && pwd)"   # backslashes: called from Windows Python
 . "$HERE/platform.sh"
 ROOT="$HOME/.local/share/content-video"
 VENV="${CONTENT_VIDEO_VENV:-$ROOT/venv}"
@@ -19,7 +19,7 @@ if [ "${1:-}" = "--speakers" ]; then
   if ! "$(venv_python "$SV")" -c "import speechbrain, torch, torchaudio" 2>/dev/null; then
     uv pip install --python "$(venv_python "$SV")" numpy scipy "speechbrain==1.1.2" torch torchaudio >&2
   fi
-  python_for_shell "$SV"
+  native_path "$(venv_python "$SV")"
   exit 0
 fi
 if [ "${1:-}" = "--vision" ]; then
@@ -43,7 +43,7 @@ if ! "$(venv_python "$VENV")" -c "import numpy, scipy, PIL, skia, janome" 2>/dev
 fi
 write_sitecustomize "$(venv_python "$VENV")"
 if [ "${1:-}" = "--check" ]; then
-  for t in ffmpeg ffprobe; do command -v $t >/dev/null && echo "ok   $t" >&2 || echo "NG   $t（必須: $(install_hint ffmpeg)）" >&2; done
+  for t in ffmpeg ffprobe; do command -v $t >/dev/null && echo "ok   $t" >&2 || echo "NG   ${t}（必須: $(install_hint ffmpeg)）" >&2; done
   command -v whisper-cli >/dev/null && echo "ok   whisper-cli（文字起こし）" >&2 || echo "NG   whisper-cli（必須: $(install_hint whisper-cpp)）" >&2
   ls ~/.local/share/whisper/ggml-*.bin >/dev/null 2>&1 && echo "ok   whisper model: $(ls ~/.local/share/whisper/ggml-*.bin | head -1)" >&2 || echo "NG   whisper のモデルがない（~/.local/share/whisper/ に ggml-large-v3-turbo-q5_0.bin）" >&2
   command -v rubberband >/dev/null && echo "ok   rubberband（1.1倍速の声）" >&2 || echo "--   rubberband なし（速度は1.0倍のみ）" >&2

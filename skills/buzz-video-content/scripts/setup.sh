@@ -4,7 +4,7 @@
 #   bash setup.sh --check   report only
 # Needs macOS (Apple Vision, VideoToolbox) and Homebrew (https://brew.sh).
 set -uo pipefail
-HERE="$(cd "$(dirname "$0")" && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]//\\//}")" && pwd)"   # backslashes: called from Windows Python
 ROOT="$HOME/.local/share/content-video"
 MODEL="${CV_WHISPER_MODEL:-$HOME/.local/share/whisper/ggml-large-v3-turbo-q5_0.bin}"
 MODEL_URL="https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1/ggml-large-v3-turbo-q5_0.bin"
@@ -41,14 +41,14 @@ tool yt-dlp yt-dlp 0 "参考動画・切り抜き元をURLから取得"
 PY=""
 VENV="${CONTENT_VIDEO_VENV:-$ROOT/venv}"
 if [ $CHECK = 1 ]; then  # report only: do not create the env
-  if "$(venv_python "$VENV")" -c "\1" 2>/dev/null; then PY="$(venv_python "$VENV")"; ok "Python環境（$PY）"
+  if "$(venv_python "$VENV")" -c "import numpy, scipy, PIL, skia, janome" 2>/dev/null; then PY="$(venv_python "$VENV")"; ok "Python環境（${PY}）"
   else ng "Python環境がない（bash setup.sh で作る）"; fi
 elif ! command -v uv >/dev/null; then ng "Python環境（uv が必要）"
-elif PY=$(bash "$HERE/env.sh"); then ok "Python環境（$PY）"
+elif PY=$(bash "$HERE/env.sh"); then ok "Python環境（${PY}）"
 else PY=""; ng "Python環境を作れなかった（上のエラーを確認）"; fi
 
 if [ -f "$MODEL" ]; then
-  ok "Whisperモデル（$MODEL）"
+  ok "Whisperモデル（${MODEL}）"
 elif [ $CHECK = 0 ]; then
   echo "..   Whisperモデルをダウンロード（約550MB）"
   mkdir -p "$(dirname "$MODEL")"
@@ -59,12 +59,12 @@ elif [ $CHECK = 0 ]; then
     rm -f "$MODEL.part"; ng "Whisperモデルのダウンロードか照合に失敗（もう一度実行してください）"
   fi
 else
-  ng "Whisperモデルがない（$MODEL）"
+  ng "Whisperモデルがない（${MODEL}）"
 fi
 
 if [ $WIN = 1 ]; then  # no Apple Vision: the MediaPipe / RapidOCR helpers (tools/vision.py) in their own env
   if [ $CHECK = 0 ] && bash "$HERE/env.sh" --vision >/dev/null; then ok "顔検出・サムネの切り抜き（MediaPipe 版）"
-  elif [ -x "$(venv_python "$ROOT/venv_vision")" ]; then ok "顔検出・サムネの切り抜き（MediaPipe 版）"
+  elif "$(venv_python "$ROOT/venv_vision")" -c "import mediapipe, rapidocr_onnxruntime" 2>/dev/null; then ok "顔検出・サムネの切り抜き（MediaPipe 版）"
   else opt "顔検出の環境なし（初めて使うときに自動で作られます）"; fi
 elif command -v swiftc >/dev/null && xcode-select -p >/dev/null 2>&1; then  # /usr/bin/swiftc exists even without the tools
   [ $CHECK = 0 ] && mkdir -p "$ROOT/bin"

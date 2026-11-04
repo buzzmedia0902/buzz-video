@@ -21,7 +21,7 @@ install_hint() { if [ $WIN = 1 ]; then echo "「buzz-video のセットアップ
 # Let the venv's scripts find the tools (Homebrew, or the folders of paths.txt) even when the calling shell lacks them
 write_sitecustomize() {
   local site
-  site="$("$1" -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])')"
+  site="$("$1" -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])' | tr -d '\r')"   # Windows prints CRLF
   [ $WIN = 1 ] && site="$(cygpath -u "$site")"
   cat > "$site/sitecustomize.py" <<'PYEOF'
 import os

@@ -65,3 +65,21 @@ def ui_font() -> str:
 def jp_bold_font() -> str:
     """A bold Japanese font file for measuring or drawing labels with PIL."""
     return font_file("ヒラギノ角ゴシック W6.ttc", "YuGothB.ttc", "meiryob.ttc", "meiryo.ttc") or ui_font()
+
+
+def bash() -> str:
+    """The bash that runs env.sh: on Windows Git Bash's (System32\\bash.exe is WSL's, which cannot see these paths)."""
+    if not WIN:
+        return "bash"
+    git = shutil.which("git")
+    cands = [os.path.join(os.path.dirname(os.path.dirname(git)), "bin", "bash.exe")] if git else []
+    cands += [os.path.expandvars(r"%ProgramFiles%\Git\bin\bash.exe"), shutil.which("bash") or ""]
+    for c in cands:
+        if c and os.path.isfile(c) and "system32" not in c.lower():
+            return c
+    raise SystemExit("Git Bash not found: install Git for Windows (https://gitforwindows.org/)")
+
+
+def script_arg(path: str) -> str:
+    """A script path for bash (forward slashes, so `dirname "$0"` works)."""
+    return path.replace("\\", "/") if WIN else path

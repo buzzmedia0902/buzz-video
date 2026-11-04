@@ -25,7 +25,8 @@ def apple() -> bool:
 
 @functools.lru_cache(maxsize=None)
 def python_env() -> str:
-    r = subprocess.run(["bash", os.path.join(SCRIPTS, "env.sh"), "--vision"], capture_output=True, text=True)
+    r = subprocess.run([osdep.bash(), osdep.script_arg(os.path.join(SCRIPTS, "env.sh")), "--vision"],
+                       capture_output=True, text=True)
     if r.returncode != 0:
         raise SystemExit(f"could not prepare the vision environment: {r.stderr.strip()[-400:]}")
     return r.stdout.strip().splitlines()[-1]

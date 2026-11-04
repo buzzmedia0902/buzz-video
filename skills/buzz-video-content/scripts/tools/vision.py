@@ -51,6 +51,13 @@ def model(key: str) -> str:
     return path
 
 
+def _base(key: str):
+    """Model options from bytes: MediaPipe cannot open a model file under a non-ASCII path on Windows."""
+    from mediapipe.tasks.python import BaseOptions
+    with open(model(key), "rb") as f:
+        return BaseOptions(model_asset_buffer=f.read())
+
+
 def images(folder: str) -> list[str]:
     return sorted(f for f in os.listdir(folder) if f.lower().endswith(".jpg"))
 
@@ -67,9 +74,9 @@ def emit(row: dict) -> None:
 
 # ---------------------------------------------------------------- faces
 def faces(folder: str) -> None:
-    from mediapipe.tasks.python import BaseOptions, vision
+    from mediapipe.tasks.python import vision
     det = vision.FaceDetector.create_from_options(vision.FaceDetectorOptions(
-        base_options=BaseOptions(model_asset_path=model("detector")), min_detection_confidence=0.5))
+        base_options=_base("detector"), min_detection_confidence=0.5))
     for name in images(folder):
         img, w, h = mp_image(os.path.join(folder, name))
         out = []
@@ -97,9 +104,9 @@ def _euler(m: np.ndarray) -> tuple[float, float, float]:
 
 
 def landmarks(folder: str) -> None:
-    from mediapipe.tasks.python import BaseOptions, vision
+    from mediapipe.tasks.python import vision
     lm = vision.FaceLandmarker.create_from_options(vision.FaceLandmarkerOptions(
-        base_options=BaseOptions(model_asset_path=model("landmarker")), num_faces=4,
+        base_options=_base("landmarker"), num_faces=4,
         output_facial_transformation_matrixes=True, min_face_detection_confidence=0.5))
     for name in images(folder):
         img, w, h = mp_image(os.path.join(folder, name))
@@ -138,9 +145,9 @@ def landmarks(folder: str) -> None:
 
 # ---------------------------------------------------------------- lift
 def lift(pairs: list[str]) -> None:
-    from mediapipe.tasks.python import BaseOptions, vision
+    from mediapipe.tasks.python import vision
     seg = vision.ImageSegmenter.create_from_options(vision.ImageSegmenterOptions(
-        base_options=BaseOptions(model_asset_path=model("segmenter")), output_confidence_masks=True))
+        base_options=_base("segmenter"), output_confidence_masks=True))
     for src, prefix in zip(pairs[::2], pairs[1::2]):
         img, w, h = mp_image(src)
         masks = seg.segment(img).confidence_masks           # 0 background, 1 hair, 2 body, 3 face, 4 clothes, 5 other
@@ -156,8 +163,9 @@ def textboxes(folder: str) -> None:
     ocr = RapidOCR()
     for name in images(folder):
         path = os.path.join(folder, name)
-        w, h = Image.open(path).size
-        result, _ = ocr(path)
+        rgb = np.asarray(Image.open(path).convert("RGB"))
+        h, w = rgb.shape[:2]
+        result, _ = ocr(rgb[:, :, ::-1].copy())          # BGR array: cv2 cannot read non-ASCII paths on Windows
         lines = []
         for quad, text, conf in result or []:
             q = np.asarray(quad, np.float32)

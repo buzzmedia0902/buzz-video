@@ -1,0 +1,6 @@
+# shell and Python must keep LF on Windows checkouts (bash reads CRLF as part of each line)
+*.sh text eol=lf
+*.py text eol=lf
+*.json text eol=lf
+*.swift text eol=lf
+*.md text eol=lf

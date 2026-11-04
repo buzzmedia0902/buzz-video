@@ -51,12 +51,17 @@ def ensure_env() -> None:
         return
     if os.environ.get("CV_SPK_CHILD"):
         raise SystemExit("torch / speechbrain are missing in the speaker env: bash env.sh --speakers")
-    out = subprocess.run(["bash", os.path.join(HERE, "env.sh"), "--speakers"], stdout=subprocess.PIPE, text=True)
+    from cv import osdep
+    out = subprocess.run([osdep.bash(), osdep.script_arg(os.path.join(HERE, "env.sh")), "--speakers"],
+                         stdout=subprocess.PIPE, text=True)
     if out.returncode:
         raise SystemExit("the speaker env could not be built (see the messages above)")
     py = out.stdout.strip().splitlines()[-1]
     print(f"[speakers] running under {py}", file=sys.stderr, flush=True)
-    os.execve(py, [py, os.path.abspath(__file__), *sys.argv[1:]], {**os.environ, "CV_SPK_CHILD": "1"})
+    env = {**os.environ, "CV_SPK_CHILD": "1", "PYTHONUTF8": "1"}
+    if osdep.WIN:  # execve does not replace the process on Windows: wait for the child instead
+        sys.exit(subprocess.run([py, os.path.abspath(__file__), *sys.argv[1:]], env=env).returncode)
+    os.execve(py, [py, os.path.abspath(__file__), *sys.argv[1:]], env)
 
 
 class Embedder:
