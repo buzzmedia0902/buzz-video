@@ -11,9 +11,7 @@ from __future__ import annotations
 import json
 import os
 import re
-import shutil
 import subprocess
-import sys
 import tempfile
 from dataclasses import asdict, dataclass
 
@@ -21,7 +19,7 @@ import numpy as np
 from PIL import Image, ImageDraw
 from scipy import ndimage
 
-from cv import osdep
+from cv import osdep, vision
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SCRIPTS = os.path.normpath(os.path.join(HERE, "..", ".."))
@@ -102,37 +100,24 @@ def grab(path: str, rot: int, t: float, out: str) -> str:
 
 # ---------------------------------------------------------------- faces
 def detect_faces(paths: list[str]) -> list[list[list[float]]]:
-    """Apple Vision faces per image: [[x, y, w, h, conf, yaw], ...] normalised, origin top-left."""
-    sys.path.insert(0, SCRIPTS)
-    import faces
+    """Faces per image (cv/vision.py): [[x, y, w, h, conf, yaw], ...] normalised, origin top-left."""
     with tempfile.TemporaryDirectory() as d:
         for i, p in enumerate(paths):
             osdep.link_or_copy(os.path.abspath(p), os.path.join(d, f"{i + 1:06d}.jpg"))   # Vision sniffs the content
         rows = {}
-        for line in subprocess.run([faces.binary(), d], capture_output=True, text=True, check=True).stdout.splitlines():
+        for line in subprocess.run([*vision.command("faces"), d], capture_output=True, text=True, check=True).stdout.splitlines():
             r = json.loads(line)
             rows[r["f"]] = r["faces"]
     return [rows.get(f"{i + 1:06d}.jpg", []) for i in range(len(paths))]
 
 
-def landmarks_binary() -> str:
-    src = os.path.join(SCRIPTS, "tools", "landmarks.swift")
-    out = os.path.expanduser("~/.local/share/content-video/bin/landmarks")
-    if not os.path.exists(out) or os.path.getmtime(out) < os.path.getmtime(src):
-        if not shutil.which("swiftc"):
-            raise SystemExit("swiftc not found: expressions need Apple Vision (Xcode command line tools)")
-        os.makedirs(os.path.dirname(out), exist_ok=True)
-        subprocess.run(["swiftc", "-O", src, "-o", out], check=True)
-    return out
-
-
 def detect_expressions(paths: list[str]) -> list[dict]:
-    """Expression numbers of the largest face per image (tools/landmarks.swift); {} where there is none."""
+    """Expression numbers of the largest face per image (cv/vision.py "landmarks"); {} where there is none."""
     with tempfile.TemporaryDirectory() as d:
         for i, p in enumerate(paths):
             osdep.link_or_copy(os.path.abspath(p), os.path.join(d, f"{i + 1:06d}.jpg"))
         rows = {}
-        for line in subprocess.run([landmarks_binary(), d], capture_output=True, text=True,
+        for line in subprocess.run([*vision.command("landmarks"), d], capture_output=True, text=True,
                                    check=True).stdout.splitlines():
             if line.startswith("{"):
                 r = json.loads(line)

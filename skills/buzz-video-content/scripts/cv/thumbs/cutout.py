@@ -12,7 +12,6 @@ from __future__ import annotations
 
 import glob
 import os
-import shutil
 import subprocess
 from dataclasses import dataclass
 from typing import Sequence
@@ -22,19 +21,9 @@ import skia
 from PIL import Image
 from scipy import ndimage
 
+from cv import vision
+
 HERE = os.path.dirname(os.path.abspath(__file__))
-SRC = os.path.normpath(os.path.join(HERE, "..", "..", "tools", "lift.swift"))
-BIN = os.path.expanduser("~/.local/share/content-video/bin/lift")
-
-
-def lift_binary() -> str:
-    """Compile tools/lift.swift once (and again when the source is newer)."""
-    if not os.path.exists(BIN) or os.path.getmtime(BIN) < os.path.getmtime(SRC):
-        if not shutil.which("swiftc"):
-            raise SystemExit("swiftc not found: the thumbnail cut-out needs Apple Vision (Xcode command line tools)")
-        os.makedirs(os.path.dirname(BIN), exist_ok=True)
-        subprocess.run(["swiftc", "-O", SRC, "-o", BIN], check=True)
-    return BIN
 
 
 def matte_frames(frames: Sequence[str]) -> None:
@@ -42,7 +31,7 @@ def matte_frames(frames: Sequence[str]) -> None:
     todo = [f for f in frames if not os.path.exists(os.path.splitext(f)[0] + "_person.png")]
     if not todo:
         return
-    args = [lift_binary()]
+    args = vision.command("lift")
     for f in todo:
         stem = os.path.splitext(f)[0]
         for old in glob.glob(stem + "_fg*.png"):
@@ -50,7 +39,7 @@ def matte_frames(frames: Sequence[str]) -> None:
         args += [f, stem]
     r = subprocess.run(args, capture_output=True, text=True)
     if r.returncode != 0:
-        raise SystemExit(f"cut-out (Apple Vision) failed: {(r.stderr or r.stdout).strip()[:300]}")
+        raise SystemExit(f"cut-out failed: {(r.stderr or r.stdout).strip()[:300]}")
 
 
 @dataclass(frozen=True)
