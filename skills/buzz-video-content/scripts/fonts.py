@@ -42,6 +42,10 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--install", action="store_true", help="brew install --cask the missing Google fonts")
     a = ap.parse_args()
+    if os.name == "nt":
+        missing = [f for f in ("Yu Gothic", "Yu Mincho", "Rounded Mplus 1c") if not has(f)]
+        print("--   フォントなし（游ゴシックかメイリオで代用）: " + "、".join(missing) if missing else "ok   フォント")
+        return
     missing_book = []
     for family in sorted(set(FAMILIES.values())):
         if has(family):

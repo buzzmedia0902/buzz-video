@@ -17,6 +17,8 @@ import subprocess
 
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 
+from core import osdep
+
 
 def frame(path: str, t: float, rot: int) -> Image.Image:
     if path.lower().endswith((".jpg", ".jpeg", ".png", ".webp")):
@@ -31,7 +33,7 @@ def frame(path: str, t: float, rot: int) -> Image.Image:
 def draw_grid(im: Image.Image) -> Image.Image:
     im = im.resize((900, int(900 * im.height / im.width)), Image.LANCZOS)
     d = ImageDraw.Draw(im)
-    f = ImageFont.truetype("/System/Library/Fonts/Helvetica.ttc", 20)
+    f = ImageFont.truetype(osdep.ui_font(), 20)
     for k in range(1, 20):
         v, major = k / 20, k % 2 == 0
         col, wd = ((255, 40, 40), 2) if major else ((255, 150, 150), 1)

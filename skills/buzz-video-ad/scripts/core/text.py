@@ -15,6 +15,7 @@ from functools import lru_cache
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
+from core import osdep
 from core.draw import ease_out_cubic, rgb, premult, blit, shadow_for, tight
 
 
@@ -28,6 +29,8 @@ _ASSETS = sorted(glob.glob("/System/Library/AssetsV2/com_apple_MobileAsset_Font*
 
 @lru_cache(maxsize=None)
 def _sysfont(part: str) -> str | None:
+    if not os.path.isdir(_SYS):
+        return None
     for f in os.listdir(_SYS):
         if part in unicodedata.normalize("NFC", f):
             return os.path.join(_SYS, f)
@@ -78,6 +81,25 @@ _FONT_SPECS = {
     "helv_b": [(lambda: f"{_SYS}/HelveticaNeue.ttc", 1)],
     "helv_m": [(lambda: f"{_SYS}/HelveticaNeue.ttc", 10)],
 }
+# Windows: built-in fonts closest to each key, plus M PLUS Rounded 1c that the setup installs
+_WIN = {
+    "mincho": [("yumin.ttf", 0)], "midashi": [("yumindb.ttf", 0)], "hmin3": [("yumin.ttf", 0)],
+    "hmin6": [("yumindb.ttf", 0)], "yumin": [("yumin.ttf", 0)], "yumin_b": [("yumindb.ttf", 0)],
+    "goth3": [("YuGothR.ttc", 0)], "goth4": [("YuGothR.ttc", 0)], "goth6": [("YuGothB.ttc", 0)],
+    "goth8": [("YuGothB.ttc", 0)], "tgoth": [("YuGothM.ttc", 0)], "tgoth_x": [("YuGothB.ttc", 0)],
+    "maru": [("MPLUSRounded1c-Medium.ttf", 0), ("BIZ-UDGothicR.ttc", 0)],
+    "tmaru": [("MPLUSRounded1c-Medium.ttf", 0), ("BIZ-UDGothicR.ttc", 0)],
+    "klee": [("MPLUSRounded1c-Regular.ttf", 0), ("BIZ-UDGothicR.ttc", 0)],
+    "hand": [("MPLUSRounded1c-Regular.ttf", 0), ("BIZ-UDGothicR.ttc", 0)],
+    "optima": [("Candara.ttf", 0)], "optima_b": [("candarab.ttf", 0)],
+    "didot": [("georgia.ttf", 0)], "didot_i": [("georgiai.ttf", 0)],
+    "avenir": [("segoeui.ttf", 0)], "avenir_m": [("seguisb.ttf", 0)], "avenir_b": [("segoeuib.ttf", 0)],
+    "avenir_x": [("seguibl.ttf", 0)], "avenir_ul": [("segoeuil.ttf", 0)],
+    "futura": [("GOTHIC.TTF", 0), ("segoeui.ttf", 0)],
+    "helv": [("arial.ttf", 0)], "helv_b": [("arialbd.ttf", 0)], "helv_m": [("arial.ttf", 0)],
+}
+for _k, _alts in _WIN.items():
+    _FONT_SPECS[_k] += [((lambda n=n: osdep.font_file(n)), i) for n, i in _alts]
 FONT_KEYS = tuple(_FONT_SPECS)
 _font_cache: dict = {}
 
@@ -92,8 +114,11 @@ def font(key: str, size: int) -> ImageFont.FreeTypeFont:
         if path and os.path.exists(path):
             _font_cache[k] = ImageFont.truetype(path, int(size), index=idx)
             return _font_cache[k]
-    print(f"[engine] font {key!r} not found, using Hiragino Sans W6", flush=True)
-    _font_cache[k] = ImageFont.truetype(_sysfont("ヒラギノ角ゴシック W6"), int(size), index=0)
+    fallback = _sysfont("ヒラギノ角ゴシック W6") or osdep.font_file("YuGothB.ttc", "meiryob.ttc", "meiryo.ttc")
+    if not fallback:
+        raise SystemExit(f"no Japanese font found for {key!r} (run the setup)")
+    print(f"[engine] font {key!r} not found, using {os.path.basename(fallback)}", flush=True)
+    _font_cache[k] = ImageFont.truetype(fallback, int(size), index=0)
     return _font_cache[k]
 
 

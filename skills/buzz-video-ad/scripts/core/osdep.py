@@ -38,3 +38,25 @@ def link_or_copy(src: str, dst: str) -> None:
         os.symlink(src, dst)
     except OSError:
         shutil.copyfile(src, dst)
+
+
+# folders searched for font files by name (macOS system fonts, Windows system and per-user fonts)
+FONT_DIRS = ([os.path.join(os.environ.get("WINDIR", r"C:\Windows"), "Fonts"),
+              os.path.expandvars(r"%LOCALAPPDATA%\Microsoft\Windows\Fonts")] if WIN else
+             ["/System/Library/Fonts", "/System/Library/Fonts/Supplemental", "/Library/Fonts",
+              os.path.expanduser("~/Library/Fonts")])
+
+
+def font_file(*names: str) -> str | None:
+    """First font file found among names (file names like "meiryo.ttc", case-insensitive on Windows)."""
+    for name in names:
+        for d in FONT_DIRS:
+            p = os.path.join(d, name)
+            if os.path.exists(p):
+                return p
+    return None
+
+
+def ui_font() -> str:
+    """A Latin UI font file for contact sheets and labels."""
+    return font_file("Helvetica.ttc", "segoeui.ttf", "arial.ttf") or "DejaVuSans.ttf"

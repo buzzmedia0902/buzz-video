@@ -91,12 +91,13 @@ def parallel(a: argparse.Namespace, out: str, n_frames: int) -> None:
 
 def sheet(images: list, path: str, cols: int = 8) -> None:
     from PIL import Image, ImageDraw, ImageFont
+    from core import osdep
     tw = 270
     th = int(tw * images[0][1].height / images[0][1].width)
     rows = (len(images) + cols - 1) // cols
     out = Image.new("RGB", (cols * tw, rows * (th + 24)), "white")
     d = ImageDraw.Draw(out)
-    f = ImageFont.truetype("/System/Library/Fonts/Helvetica.ttc", 18)
+    f = ImageFont.truetype(osdep.ui_font(), 18)
     for i, (t, im) in enumerate(images):
         x, y = (i % cols) * tw, (i // cols) * (th + 24)
         out.paste(im.resize((tw, th)), (x, y + 24))

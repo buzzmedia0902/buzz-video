@@ -8,6 +8,7 @@ from __future__ import annotations
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
+from core import osdep
 from core.canvas import ASPECT, H, PLATFORM, SAFE, W, safe_margins
 
 
@@ -52,7 +53,7 @@ def draw_guides(frame_u8: np.ndarray, aspect: str = ASPECT) -> np.ndarray:
     img = Image.fromarray(frame_u8).convert("RGBA")
     over = Image.new("RGBA", img.size, (0, 0, 0, 0))
     d = ImageDraw.Draw(over)
-    f = ImageFont.truetype("/System/Library/Fonts/Helvetica.ttc", 22)
+    f = ImageFont.truetype(osdep.ui_font(), 22)
     for (asp, plat), (l, t, r, b) in SAFE.items():
         if asp != aspect:
             continue

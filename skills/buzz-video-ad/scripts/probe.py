@@ -29,7 +29,7 @@ from core import osdep  # noqa: E402
 
 VIDEO = (".mov", ".mp4", ".m4v", ".avi", ".mts")
 IMAGE = (".jpg", ".jpeg", ".png", ".heic", ".heif", ".webp")
-FONT = "/System/Library/Fonts/Helvetica.ttc"
+FONT = osdep.ui_font()
 # same LUT as core/engine.py: HLG clips are tested for flashes in the SDR the renderer sees
 LUT_HLG = os.path.expanduser(os.environ.get("SNS_HLG_LUT", "~/.local/share/sns-ad-video/hlg2sdr_65.cube"))
 

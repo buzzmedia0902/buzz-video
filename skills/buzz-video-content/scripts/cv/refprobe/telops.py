@@ -6,7 +6,9 @@ import re
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
-FONT = "/System/Library/Fonts/ヒラギノ角ゴシック W6.ttc"
+from cv import osdep
+
+FONT = osdep.jp_bold_font()
 
 
 def color_name(rgb) -> str:
