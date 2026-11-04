@@ -16,7 +16,7 @@ import sys
 import skia
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from cv.gfx import FAMILIES  # noqa: E402
+from cv.gfx import FAMILIES, downloaded  # noqa: E402
 
 # macOS fonts that Font Book downloads on request (name shown in Font Book)
 FONT_BOOK = {
@@ -35,7 +35,7 @@ OPTIONAL = {"Noto Sans JP": "brew install --cask font-noto-sans-jp"}
 
 
 def has(family: str) -> bool:
-    return skia.FontMgr().matchFamilyStyle(family, skia.FontStyle()) is not None
+    return downloaded(family) and skia.FontMgr().matchFamilyStyle(family, skia.FontStyle()) is not None
 
 
 def main() -> None:

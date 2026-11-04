@@ -23,10 +23,6 @@ jobs:
         with:
           path: ~/.local/share/whisper
           key: whisper-ggml-large-v3-turbo-q5_0
-      - name: Fonts (macOS)
-        # installed up front: on the runner, querying fonts right after setup.sh installs this cask hung for an hour
-        if: runner.os == 'macOS'
-        run: brew install --cask font-m-plus-rounded-1c
       - name: Setup
         timeout-minutes: 25
         run: bash setup.sh
