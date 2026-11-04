@@ -18,6 +18,8 @@ import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
+from cv import osdep  # noqa: E402
+
 BIN = os.path.expanduser("~/.local/share/content-video/bin/faces")
 
 
@@ -32,7 +34,7 @@ def binary() -> str:
 def scan(path: str, out: str, rot: int = 0) -> None:
     rotf = {90: "transpose=1,", 180: "hflip,vflip,", 270: "transpose=2,"}.get(rot, "")
     with tempfile.TemporaryDirectory() as d:
-        subprocess.run(["ffmpeg", "-v", "error", "-hwaccel", "videotoolbox", "-i", path, "-vf",
+        subprocess.run(["ffmpeg", "-v", "error", *osdep.hwaccel(), "-i", path, "-vf",
                         f"fps=2,{rotf}scale=640:-2", "-q:v", "4", os.path.join(d, "%06d.jpg")], check=True)
         res = subprocess.run([binary(), d], capture_output=True, text=True, check=True).stdout
     os.makedirs(os.path.dirname(out), exist_ok=True)

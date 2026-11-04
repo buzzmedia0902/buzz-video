@@ -25,6 +25,8 @@ import sys
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 
+from cv import osdep  # noqa: E402
+
 VIDEO = (".mov", ".mp4", ".m4v", ".avi", ".mts")
 IMAGE = (".jpg", ".jpeg", ".png", ".heic", ".heif", ".webp")
 FONT = "/System/Library/Fonts/Helvetica.ttc"
@@ -64,8 +66,8 @@ def flashes(path: str, fps: float, hlg: bool = False) -> list[float]:
     vf = f"scale={side}:{side},format=rgb24"
     if hlg and os.path.exists(LUT_HLG):
         vf = (f"scale={side}:{side}:in_color_matrix=bt2020:in_range=tv,format=rgb48le,"
-              f"lut3d=file='{LUT_HLG}':interp=tetrahedral,format=rgb24")
-    raw = subprocess.run(["ffmpeg", "-v", "error", "-hwaccel", "videotoolbox", "-i", path, "-vf", vf,
+              f"lut3d=file='{osdep.ffpath(LUT_HLG)}':interp=tetrahedral,format=rgb24")
+    raw = subprocess.run(["ffmpeg", "-v", "error", *osdep.hwaccel(), "-i", path, "-vf", vf,
                           "-f", "rawvideo", "-"], capture_output=True, check=True).stdout
     fr = np.frombuffer(raw, np.uint8).reshape(-1, side, side, 3).astype(np.float32)
     stat = np.stack([fr.mean(axis=(1, 2, 3)), (fr[..., 0] - fr[..., 1]).mean(axis=(1, 2))], axis=1)
@@ -140,7 +142,7 @@ def main() -> None:
         elif ext in IMAGE:
             if ext in (".heic", ".heif"):
                 jpg = os.path.join(a.out, os.path.splitext(name)[0] + ".jpg")
-                subprocess.run(["sips", "-s", "format", "jpeg", path, "--out", jpg], capture_output=True, check=True)
+                osdep.convert_still(path, jpg)
                 path = jpg
             im = ImageOps.exif_transpose(Image.open(path)).convert("RGB")
             info = {"kind": "image", "w": im.width, "h": im.height, "path": path,

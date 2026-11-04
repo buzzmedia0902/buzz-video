@@ -26,6 +26,7 @@ from PIL import Image, ImageOps
 from scipy.ndimage import gaussian_filter
 
 from core.canvas import FPS, H, W
+from core import osdep
 from core.draw import (clamp01, ease_out_cubic, ease_in_cubic, ease_in_out_sine, ease_in_out_cubic, ease_out_back,
     smoothstep, window, leave, rgb, mix, premult, blit, blit_img, solid_sprite, shadow_for, with_shadow, tight)  # noqa: F401 (re-exported)
 from core.text import (FONT_KEYS, font, SQUEEZE, OPEN, _advance, text_img, text_width, fit_size, vtext_img,
@@ -150,7 +151,7 @@ class Source:
             if not os.path.exists(LUT_HLG):
                 raise SystemExit(f"HLG source {self.s.path}: run prep_hdr.py once to create {LUT_HLG}")
             return (f"{rot}scale={self.dw}:{self.dh}:flags=lanczos:in_color_matrix=bt2020:in_range=tv,"
-                    f"format=rgb48le,lut3d=file='{LUT_HLG}':interp=tetrahedral,format=rgb24")
+                    f"format=rgb48le,lut3d=file='{osdep.ffpath(LUT_HLG)}':interp=tetrahedral,format=rgb24")
         return f"{rot}scale={self.dw}:{self.dh}:flags=lanczos,format=rgb24"
 
     def frame(self, t: float) -> np.ndarray:

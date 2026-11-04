@@ -30,6 +30,8 @@ import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
+from cv import osdep  # noqa: E402
+
 BIN = os.path.expanduser("~/.local/share/content-video/bin")
 DETECT_FPS = 30
 
@@ -62,7 +64,7 @@ def probe(path: str) -> dict:
 
 
 def ffmpeg_raw(path: str, secs: float, vf: str) -> bytes:
-    return subprocess.run(["ffmpeg", "-v", "error", "-hwaccel", "videotoolbox", "-t", f"{secs:.2f}", "-i", path,
+    return subprocess.run(["ffmpeg", "-v", "error", *osdep.hwaccel(), "-t", f"{secs:.2f}", "-i", path,
                            "-vf", vf, "-f", "rawvideo", "-"], capture_output=True, check=True).stdout
 
 
@@ -73,7 +75,7 @@ def sample_frames(path: str, secs: float, step: float, out_dir: str, tag: str, w
         os.remove(old)
     vf = (f"select='isnan(prev_selected_t)+gte(t-prev_selected_t,{step})',showinfo,"
           f"scale='min({width},iw)':-2:flags=lanczos")
-    r = subprocess.run(["ffmpeg", "-hide_banner", "-v", "info", "-hwaccel", "videotoolbox", "-t", f"{secs:.2f}", "-i",
+    r = subprocess.run(["ffmpeg", "-hide_banner", "-v", "info", *osdep.hwaccel(), "-t", f"{secs:.2f}", "-i",
                         path, "-vf", vf, "-fps_mode", "vfr", "-q:v", "3", os.path.join(out_dir, f"{tag}%04d.jpg")],
                        capture_output=True, text=True)
     times = [float(m) for m in re.findall(r"pts_time:\s*([0-9.]+)", r.stderr)]
@@ -97,7 +99,7 @@ def jsonl(binary: str, files: list[str]) -> list[dict]:
     import tempfile
     with tempfile.TemporaryDirectory() as d:
         for i, f in enumerate(files):
-            os.symlink(os.path.abspath(f), os.path.join(d, f"{i + 1:06d}.jpg"))
+            osdep.link_or_copy(os.path.abspath(f), os.path.join(d, f"{i + 1:06d}.jpg"))
         rows = {}
         for line in subprocess.run([binary, d], capture_output=True, text=True, check=True).stdout.splitlines():
             if line.startswith("{"):

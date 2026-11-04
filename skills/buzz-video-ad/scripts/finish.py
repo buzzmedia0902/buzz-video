@@ -119,7 +119,7 @@ def light_copy(final: str, out: str, dur: float, log: str) -> None:
     common = ["-vf", BT709, "-c:v", "libx264", "-preset", "slow", "-b:v", f"{kbps}k", "-maxrate",
               f"{int(kbps * 1.45)}k", "-bufsize", f"{kbps * 2}k"]
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", final, *common, "-pass", "1", "-passlogfile", log, "-an",
-                    "-f", "null", "/dev/null"], check=True)
+                    "-f", "null", "-"], check=True)
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", final, *common, "-pass", "2", "-passlogfile", log,
                     "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "160k", "-movflags", "+faststart", out], check=True)
     for f in os.listdir(os.path.dirname(log)):

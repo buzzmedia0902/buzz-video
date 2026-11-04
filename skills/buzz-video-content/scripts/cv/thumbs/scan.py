@@ -21,6 +21,8 @@ import numpy as np
 from PIL import Image, ImageDraw
 from scipy import ndimage
 
+from cv import osdep
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 SCRIPTS = os.path.normpath(os.path.join(HERE, "..", ".."))
 STEP = 1.5
@@ -62,7 +64,7 @@ def _hdr(path: str) -> str:
     if not media.probe(path)["hlg"]:
         return ""
     return (",scale=iw:ih:flags=lanczos:in_color_matrix=bt2020:in_range=tv,format=rgb48le,"
-            f"lut3d=file='{media.hlg_lut()}':interp=tetrahedral,format=rgb24")
+            f"lut3d=file='{osdep.ffpath(media.hlg_lut())}':interp=tetrahedral,format=rgb24")
 
 
 def _run_frames(path: str, rot: int, t0: float, dur: float, select: str, out_dir: str, ext: str = "jpg",
@@ -73,7 +75,7 @@ def _run_frames(path: str, rot: int, t0: float, dur: float, select: str, out_dir
         if old.startswith("f") and old.endswith("." + ext):
             os.remove(os.path.join(out_dir, old))
     vf = f"{ROT.get(rot, '')}select='{select}',showinfo{_hdr(path)}"
-    cmd = ["ffmpeg", "-hide_banner", "-v", "info", "-hwaccel", "videotoolbox", "-ss", f"{max(0.0, t0):.3f}", "-t",
+    cmd = ["ffmpeg", "-hide_banner", "-v", "info", *osdep.hwaccel(), "-ss", f"{max(0.0, t0):.3f}", "-t",
            f"{dur:.3f}", "-i", os.path.expanduser(path), "-map", "0:v:0", "-vf", vf, "-fps_mode", "vfr"]
     cmd += ["-q:v", q] if ext == "jpg" else []
     r = subprocess.run(cmd + [os.path.join(out_dir, f"f%04d.{ext}")], capture_output=True, text=True)
@@ -105,7 +107,7 @@ def detect_faces(paths: list[str]) -> list[list[list[float]]]:
     import faces
     with tempfile.TemporaryDirectory() as d:
         for i, p in enumerate(paths):
-            os.symlink(os.path.abspath(p), os.path.join(d, f"{i + 1:06d}.jpg"))   # Vision sniffs the content
+            osdep.link_or_copy(os.path.abspath(p), os.path.join(d, f"{i + 1:06d}.jpg"))   # Vision sniffs the content
         rows = {}
         for line in subprocess.run([faces.binary(), d], capture_output=True, text=True, check=True).stdout.splitlines():
             r = json.loads(line)
@@ -128,7 +130,7 @@ def detect_expressions(paths: list[str]) -> list[dict]:
     """Expression numbers of the largest face per image (tools/landmarks.swift); {} where there is none."""
     with tempfile.TemporaryDirectory() as d:
         for i, p in enumerate(paths):
-            os.symlink(os.path.abspath(p), os.path.join(d, f"{i + 1:06d}.jpg"))
+            osdep.link_or_copy(os.path.abspath(p), os.path.join(d, f"{i + 1:06d}.jpg"))
         rows = {}
         for line in subprocess.run([landmarks_binary(), d], capture_output=True, text=True,
                                    check=True).stdout.splitlines():
