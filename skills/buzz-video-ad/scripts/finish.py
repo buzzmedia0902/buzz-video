@@ -118,9 +118,9 @@ def light_copy(final: str, out: str, dur: float, log: str) -> None:
     kbps = int(min(5500, LIGHT_MAX_MB * 8e3 / dur - 200))
     common = ["-vf", BT709, "-c:v", "libx264", "-preset", "slow", "-b:v", f"{kbps}k", "-maxrate",
               f"{int(kbps * 1.45)}k", "-bufsize", f"{kbps * 2}k"]
-    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", final, *common, "-pass", "1", "-passlogfile", log, "-an",
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", final, *common, "-pass:v", "1", "-passlogfile:v", log, "-an",
                     "-f", "null", "-"], check=True)
-    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", final, *common, "-pass", "2", "-passlogfile", log,
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", final, *common, "-pass:v", "2", "-passlogfile:v", log,
                     "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "160k", "-movflags", "+faststart", out], check=True)
     for f in os.listdir(os.path.dirname(log)):
         if f.startswith(os.path.basename(log)):

@@ -149,9 +149,9 @@ def light_copy(final: str, out: str, fmt: str, dur: float, passlog: str) -> dict
     preset = "slow" if dur <= 300 else "medium"                     # long videos: about twice as fast for a little less quality
     common = ["-vf", scale + BT709, "-c:v", "libx264", "-preset", preset, "-b:v", f"{kbps}k", "-maxrate",
               f"{int(kbps * 1.45)}k", "-bufsize", f"{kbps * 2}k", "-pix_fmt", "yuv420p"]
-    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", final, *common, "-pass", "1", "-passlogfile", passlog, "-an",
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", final, *common, "-pass:v", "1", "-passlogfile:v", passlog, "-an",
                     "-f", "null", "-"], check=True)
-    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", final, *common, "-pass", "2", "-passlogfile", passlog,
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", final, *common, "-pass:v", "2", "-passlogfile:v", passlog,
                     "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart", out], check=True)
     for f in os.listdir(os.path.dirname(passlog)):
         if f.startswith(os.path.basename(passlog)):
