@@ -20,9 +20,9 @@
 - 広告では、業種ごとの規制（医療・鍼灸・化粧品など）を確認しながら文言を決めます。
 
 ## 動作環境
-- macOS（Apple Silicon 推奨）。顔の検出に Apple Vision、動画の読み込みに VideoToolbox を使います。
+- **macOS**（Apple Silicon 推奨）：顔の検出に Apple Vision、動画の読み込みに VideoToolbox を使います。[Homebrew](https://brew.sh) が必要です（ffmpeg・whisper-cpp・uv などを入れます）。
+- **Windows 10 / 11（64ビット）**：[Git for Windows](https://gitforwindows.org/) が必要です（Claude Code が Git Bash でスキルの手順を実行します）。顔の検出は MediaPipe、ツールはセットアップが `~/.local/opt` に入れます。Mac より書き出しに時間がかかります。
 - [Claude Code](https://claude.com/claude-code)
-- [Homebrew](https://brew.sh)（ffmpeg・whisper-cpp・uv などを入れます）
 
 ## インストール
 
@@ -40,15 +40,22 @@ mkdir -p ~/.claude/skills
 ln -sfn ~/buzz-video/skills/buzz-video-content ~/.claude/skills/buzz-video-content
 ln -sfn ~/buzz-video/skills/buzz-video-ad ~/.claude/skills/buzz-video-ad
 ```
+Windows では、PowerShell で次のように実行します（管理者権限は不要です）。
+```powershell
+git clone https://github.com/buzzmedia0902/buzz-video.git $HOME\buzz-video
+New-Item -ItemType Directory -Force $HOME\.claude\skills | Out-Null
+New-Item -ItemType Junction -Path $HOME\.claude\skills\buzz-video-content -Target $HOME\buzz-video\skills\buzz-video-content
+New-Item -ItemType Junction -Path $HOME\.claude\skills\buzz-video-ad -Target $HOME\buzz-video\skills\buzz-video-ad
+```
 
 ### 初回のセットアップ
 Claude に「buzz-video のセットアップをして」と頼むと、足りないものを入れます（方法2なら `bash ~/buzz-video/setup.sh` でも同じです）。何度実行しても、入っていないものだけを入れます。
-- Homebrew のツール：ffmpeg・whisper-cpp・uv（必須）、rubberband・yt-dlp（任意）
+- ツール：ffmpeg・whisper-cpp・uv（必須）、rubberband・yt-dlp（任意）。Mac は Homebrew で、Windows は配布元から `~/.local/opt` に入れます
 - Whisper の音声認識モデル（約550MB）
 - 無料フォント：M PLUS Rounded 1c
-- Python の環境（専用の仮想環境を `~/.local/share/` に作ります）
+- Python の環境（専用の仮想環境を `~/.local/share/` に作ります。Windows は顔検出用の環境も作ります）
 
-macOS に付いているフォントのうち、筑紫丸ゴシック・凸版文久見出し・楷体・行楷などは、Font Book（アプリ）で検索して「ダウンロード」してください。なくても動きますが、トンマナの見た目が少し簡素になります。`bash setup.sh --check` を実行すると、足りないものを確認だけできます（何も入れません）。
+macOS に付いているフォントのうち、筑紫丸ゴシック・凸版文久見出し・楷体・行楷などは、Font Book（アプリ）で検索して「ダウンロード」してください。なくても動きますが、トンマナの見た目が少し簡素になります。Windows では游ゴシック・游明朝・メイリオで代用します。`bash setup.sh --check` を実行すると、足りないものを確認だけできます（何も入れません）。
 
 ## 使い方
 素材の場所を伝えて頼むだけです。
