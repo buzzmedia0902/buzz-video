@@ -5,6 +5,7 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 W="${1:-${TMPDIR:-/tmp}/buzz-video-smoke}"
+. "$ROOT/skills/buzz-video-content/scripts/platform.sh"   # the tools setup.sh installed (Homebrew / ~/.local/opt)
 rm -rf "$W"; mkdir -p "$W/content/footage" "$W/ad/footage" "$W/ad/brand"
 step() { echo; echo "=== $*"; }
 

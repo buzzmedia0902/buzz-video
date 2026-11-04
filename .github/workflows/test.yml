@@ -23,18 +23,10 @@ jobs:
         with:
           path: ~/.local/share/whisper
           key: whisper-ggml-large-v3-turbo-q5_0
-      - name: Setup (macOS)
-        if: runner.os == 'macOS'
+      - name: Setup
         run: bash setup.sh
-      - name: Setup (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: ./setup.ps1
       - name: Smoke test
-        run: |
-          # setup.ps1 installs tools for the user; pick them up in this shell like a new terminal would
-          [ -f "$HOME/.local/share/buzz-video/path.sh" ] && . "$HOME/.local/share/buzz-video/path.sh"
-          bash tests/smoke.sh "$RUNNER_TEMP/smoke"
+        run: bash tests/smoke.sh "$RUNNER_TEMP/smoke"
       - name: Upload outputs
         if: always()
         uses: actions/upload-artifact@v4
