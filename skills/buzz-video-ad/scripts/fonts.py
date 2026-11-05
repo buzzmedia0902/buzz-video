@@ -27,6 +27,12 @@ FONT_BOOK = {  # asset file -> name shown in Font Book
 
 
 def main() -> None:
+    if os.name == "nt":
+        from core import osdep
+        need = {"YuGothB.ttc": "游ゴシック", "yumin.ttf": "游明朝", "MPLUSRounded1c-Medium.ttf": "M PLUS Rounded 1c"}
+        missing = [label for f, label in need.items() if not osdep.font_file(f)]
+        print("--   フォントなし（メイリオで代用）: " + "、".join(missing) if missing else "ok   フォント")
+        return
     with open(os.path.join(HERE, "core", "text.py"), encoding="utf-8") as f:
         wanted = sorted(set(re.findall(r'_asset_font\("([^"]+)"', f.read())))
     missing = [FONT_BOOK.get(n, n) for n in wanted if not _asset_font(n)]

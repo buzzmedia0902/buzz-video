@@ -30,6 +30,8 @@ import sys
 import numpy as np
 from PIL import Image
 
+from core import osdep  # noqa: E402
+
 PAPER, NIGHT, OFF_WHITE, INK = (247, 243, 234), (30, 25, 21), (248, 245, 239), (34, 30, 27)
 LUMA = np.array([0.2126, 0.7152, 0.0722], np.float32)
 
@@ -37,7 +39,7 @@ LUMA = np.array([0.2126, 0.7152, 0.0722], np.float32)
 def load(path: str) -> Image.Image:
     if path.lower().endswith((".heic", ".heif")):
         tmp = os.path.splitext(path)[0] + "_conv.png"
-        subprocess.run(["sips", "-s", "format", "png", path, "--out", tmp], check=True, capture_output=True)
+        osdep.convert_still(path, tmp, "png")
         path = tmp
     return Image.open(path).convert("RGBA")
 

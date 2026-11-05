@@ -1,0 +1,40 @@
+name: smoke
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cache Whisper model
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/whisper
+          key: whisper-ggml-large-v3-turbo-q5_0
+      - name: Setup
+        timeout-minutes: 25
+        run: bash setup.sh
+      - name: Smoke test
+        timeout-minutes: 25
+        run: bash tests/smoke.sh "$RUNNER_TEMP/smoke"
+      - name: Upload outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-${{ matrix.os }}
+          path: |
+            ${{ runner.temp }}/smoke/*/納品
+            ${{ runner.temp }}/smoke/*/work/review
+          if-no-files-found: ignore

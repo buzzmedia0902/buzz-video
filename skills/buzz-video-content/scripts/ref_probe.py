@@ -30,7 +30,8 @@ import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-BIN = os.path.expanduser("~/.local/share/content-video/bin")
+from cv import osdep, vision  # noqa: E402
+
 DETECT_FPS = 30
 
 
@@ -62,7 +63,7 @@ def probe(path: str) -> dict:
 
 
 def ffmpeg_raw(path: str, secs: float, vf: str) -> bytes:
-    return subprocess.run(["ffmpeg", "-v", "error", "-hwaccel", "videotoolbox", "-t", f"{secs:.2f}", "-i", path,
+    return subprocess.run(["ffmpeg", "-v", "error", *osdep.hwaccel(), "-t", f"{secs:.2f}", "-i", path,
                            "-vf", vf, "-f", "rawvideo", "-"], capture_output=True, check=True).stdout
 
 
@@ -73,7 +74,7 @@ def sample_frames(path: str, secs: float, step: float, out_dir: str, tag: str, w
         os.remove(old)
     vf = (f"select='isnan(prev_selected_t)+gte(t-prev_selected_t,{step})',showinfo,"
           f"scale='min({width},iw)':-2:flags=lanczos")
-    r = subprocess.run(["ffmpeg", "-hide_banner", "-v", "info", "-hwaccel", "videotoolbox", "-t", f"{secs:.2f}", "-i",
+    r = subprocess.run(["ffmpeg", "-hide_banner", "-v", "info", *osdep.hwaccel(), "-t", f"{secs:.2f}", "-i",
                         path, "-vf", vf, "-fps_mode", "vfr", "-q:v", "3", os.path.join(out_dir, f"{tag}%04d.jpg")],
                        capture_output=True, text=True)
     times = [float(m) for m in re.findall(r"pts_time:\s*([0-9.]+)", r.stderr)]
@@ -81,25 +82,14 @@ def sample_frames(path: str, secs: float, step: float, out_dir: str, tag: str, w
     return list(zip(times, files))
 
 
-def helper(name: str) -> str:
-    """Compile tools/<name>.swift once into ~/.local/share/content-video/bin."""
-    src, out = os.path.join(HERE, "tools", f"{name}.swift"), os.path.join(BIN, name)
-    if not os.path.exists(out) or os.path.getmtime(out) < os.path.getmtime(src):
-        if not shutil.which("swiftc"):
-            raise SystemExit("swiftc not found (Xcode command line tools): faces / telop boxes need Apple Vision")
-        os.makedirs(BIN, exist_ok=True)
-        subprocess.run(["swiftc", "-O", src, "-o", out], check=True)
-    return out
-
-
-def jsonl(binary: str, files: list[str]) -> list[dict]:
+def jsonl(cmd: list[str], files: list[str]) -> list[dict]:
     """Run a folder tool (faces / textboxes) on `files` (symlinked as 000001.jpg ...); one dict per file."""
     import tempfile
     with tempfile.TemporaryDirectory() as d:
         for i, f in enumerate(files):
-            os.symlink(os.path.abspath(f), os.path.join(d, f"{i + 1:06d}.jpg"))
+            osdep.link_or_copy(os.path.abspath(f), os.path.join(d, f"{i + 1:06d}.jpg"))
         rows = {}
-        for line in subprocess.run([binary, d], capture_output=True, text=True, check=True).stdout.splitlines():
+        for line in subprocess.run([*cmd, d], capture_output=True, text=True, check=True).stdout.splitlines():
             if line.startswith("{"):
                 r = json.loads(line)
                 rows[r["f"]] = r
@@ -146,7 +136,7 @@ def camera_stats(path: str, secs: float, cuts: list[float], work: str) -> dict |
     """Zoom switches (face size jumps at a cut) and slow push-ins (face grows inside a shot), from the largest face
     every 0.5 s. None when there is no face to follow."""
     frames = sample_frames(path, secs, 0.5, os.path.join(work, "faces"), "p", 480)
-    rows = jsonl(helper("faces"), [f for _, f in frames])
+    rows = jsonl(vision.command("faces"), [f for _, f in frames])
     t = np.array([x for x, _ in frames])
     fh = np.array([max((f[3] for f in r.get("faces", []) if f[4] > 0.5), default=np.nan) for r in rows])
     if len(t) < 8 or np.isnan(fh).mean() > 0.5:
@@ -220,7 +210,7 @@ def main() -> None:
         speech = A.speech_rate(wav, mask, out, a.lang)
     width = 720 if layout == "tall" else 1280
     frames = sample_frames(src, secs, 1.5, os.path.join(out, "frames"), "t", width)
-    rows = jsonl(helper("textboxes"), [f for _, f in frames])
+    rows = jsonl(vision.command("textboxes"), [f for _, f in frames])
     m = {"source": a.source, "analysed_s": round(secs, 1), "size": [info["w"], info["h"]], "layout": layout,
          "fps": round(info["fps"], 2),
          "shots": shots, "camera": camera, "audio": audio, "speech": speech,

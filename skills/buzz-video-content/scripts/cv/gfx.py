@@ -6,6 +6,7 @@ Fonts are looked up by family name through skia's FontMgr (macOS system + downlo
 from __future__ import annotations
 
 import functools
+import glob
 import math
 import os
 
@@ -148,7 +149,48 @@ FAMILIES = {
     "optima": "Optima",
     "didot": "Didot",
 }
+# tried in order when a family is missing (Windows has none of the Hiragino / Font Book families)
+ALTERNATES = {
+    "gothic": ["Yu Gothic", "Meiryo"],
+    "mincho": ["Yu Mincho", "MS Mincho"],
+    "maru": ["Rounded Mplus 1c", "BIZ UDPGothic"],
+    "round": ["Rounded Mplus 1c"],
+    "round_b": ["Rounded Mplus 1c"],
+    "midashi_go": ["Yu Gothic"],
+    "midashi_min": ["Yu Mincho"],
+    "kaiti": ["KaiTi", "Yu Mincho"],
+    "xingkai": ["KaiTi", "Yu Mincho"],
+    "yugothic": ["Yu Gothic"],
+    "avenir": ["Segoe UI"],
+    "futura": ["Century Gothic", "Segoe UI"],
+    "helvetica": ["Arial"],
+    "optima": ["Candara", "Segoe UI"],
+    "didot": ["Bodoni MT", "Georgia"],
+}
+# families macOS downloads on request in Font Book, by file: asking CoreText for one that is not downloaded can block
+# (it hung a fresh CI Mac for an hour), so these are only queried once their file is there
+DOWNLOADABLE = {
+    "Tsukushi A Round Gothic": "TsukushiAMaruGothic.ttc",
+    "Tsukushi B Round Gothic": "TsukushiBMaruGothic.ttc",
+    "Toppan Bunkyu Midashi Gothic": "ToppanBunkyuMidashiGothicStdN-ExtraBold.otf",
+    "Toppan Bunkyu Midashi Mincho": "ToppanBunkyuMidashiMinchoStdN-ExtraBold.otf",
+    "Kaiti SC": "Kaiti.ttc",
+    "Xingkai SC": "Xingkai.ttc",
+    "YuGothic": "YuGothic-Medium.otf",
+}
+
+
+@functools.lru_cache(maxsize=None)
+def downloaded(name: str) -> bool:
+    """False for a Font Book family whose file is not downloaded yet; True for every other family."""
+    if name not in DOWNLOADABLE or os.name == "nt":
+        return name not in DOWNLOADABLE
+    pattern = "/System/Library/AssetsV2/com_apple_MobileAsset_Font*/*/AssetData/" + DOWNLOADABLE[name]
+    return bool(glob.glob(pattern))
+
+
 FALLBACK = "Hiragino Sans"
+FALLBACKS = (FALLBACK, "Yu Gothic", "Meiryo", "Noto Sans JP")
 
 
 @functools.lru_cache(maxsize=None)
@@ -156,12 +198,16 @@ def typeface(family: str, weight: int) -> skia.Typeface:
     if os.path.isfile(os.path.expanduser(family)):
         return skia.Typeface.MakeFromFile(os.path.expanduser(family))
     name = FAMILIES.get(family, family)
-    tf = _FM.matchFamilyStyle(name, skia.FontStyle(weight, skia.FontStyle.kNormal_Width,
-                                                   skia.FontStyle.kUpright_Slant))
+    style = skia.FontStyle(weight, skia.FontStyle.kNormal_Width, skia.FontStyle.kUpright_Slant)
+    tf = _FM.matchFamilyStyle(name, style) if downloaded(name) else None
     if tf is None:
-        print(f"[gfx] font {name!r} not found, using {FALLBACK}", flush=True)
-        tf = _FM.matchFamilyStyle(FALLBACK, skia.FontStyle(weight, skia.FontStyle.kNormal_Width,
-                                                           skia.FontStyle.kUpright_Slant))
+        for alt in [*(ALTERNATES.get(family, []) if os.name == "nt" else []), *FALLBACKS]:
+            tf = _FM.matchFamilyStyle(alt, style)
+            if tf is not None:
+                print(f"[gfx] font {name!r} not found, using {alt}", flush=True)
+                break
+    if tf is None:
+        raise SystemExit(f"no Japanese font found for {name!r} (run the setup)")
     return tf
 
 

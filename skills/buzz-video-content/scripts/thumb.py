@@ -16,7 +16,8 @@ Short / clip / vlog: two 1080x1920 covers (poster on the tone's ground, and the 
 Copy marks: `｜` breaks a line, {..} the words that get the loud colour (else the last / the later lines do).
 Everything lands in <out_dir>/サムネ/ with a phone-feed preview <version>_feed.jpg. Faces: the whole talk is scanned
 every 1.5 s (Apple Vision: sharpness, eyes open, smile / open mouth), then the sharpest frame within 0.3 s of the pick.
-Needs ffmpeg and swiftc (Apple Vision: faces, expressions, the cut-out); the tools compile on first use.
+Needs ffmpeg, plus Apple Vision (swiftc; the tools compile on first use) or, without it, the MediaPipe helpers
+of tools/vision.py (env.sh --vision) for faces, expressions and the cut-out.
 """
 from __future__ import annotations
 

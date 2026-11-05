@@ -20,9 +20,9 @@
 - Ads check industry rules (medical, acupuncture, cosmetics, ...) while the copy is written.
 
 ## Requirements
-- macOS (Apple Silicon recommended): Apple Vision for faces, VideoToolbox for decoding.
+- **macOS** (Apple Silicon recommended): Apple Vision for faces, VideoToolbox for decoding. Needs [Homebrew](https://brew.sh) (for ffmpeg, whisper-cpp, uv, ...).
+- **Windows 10 / 11 (64-bit)**: needs [Git for Windows](https://gitforwindows.org/) (Claude Code runs the skills' steps in Git Bash). Faces come from MediaPipe; the setup unpacks the tools under `~/.local/opt`. Rendering is slower than on a Mac.
 - [Claude Code](https://claude.com/claude-code)
-- [Homebrew](https://brew.sh) (for ffmpeg, whisper-cpp, uv, ...)
 
 ## Install
 
@@ -39,15 +39,22 @@ mkdir -p ~/.claude/skills
 ln -sfn ~/buzz-video/skills/buzz-video-content ~/.claude/skills/buzz-video-content
 ln -sfn ~/buzz-video/skills/buzz-video-ad ~/.claude/skills/buzz-video-ad
 ```
+On Windows, in PowerShell (no admin rights needed):
+```powershell
+git clone https://github.com/buzzmedia0902/buzz-video.git $HOME\buzz-video
+New-Item -ItemType Directory -Force $HOME\.claude\skills | Out-Null
+New-Item -ItemType Junction -Path $HOME\.claude\skills\buzz-video-content -Target $HOME\buzz-video\skills\buzz-video-content
+New-Item -ItemType Junction -Path $HOME\.claude\skills\buzz-video-ad -Target $HOME\buzz-video\skills\buzz-video-ad
+```
 
 ### First-time setup
 Ask Claude to "set up buzz-video" (or run `bash ~/buzz-video/setup.sh`). It installs only what is missing:
-- Homebrew tools: ffmpeg, whisper-cpp, uv (required); rubberband, yt-dlp (optional)
+- tools: ffmpeg, whisper-cpp, uv (required); rubberband, yt-dlp (optional), from Homebrew on a Mac and from their publishers into `~/.local/opt` on Windows
 - the Whisper model (about 550 MB)
 - a free font: M PLUS Rounded 1c
-- a private Python environment under `~/.local/share/`
+- a private Python environment under `~/.local/share/` (on Windows also one for face detection)
 
-Some fonts that come with macOS (Tsukushi Round Gothic, Toppan Bunkyu Midashi, Kaiti, Xingkai, ...) must be downloaded once in Font Book. Without them the skills still work, with plainer type. `bash setup.sh --check` only reports and installs nothing.
+Some fonts that come with macOS (Tsukushi Round Gothic, Toppan Bunkyu Midashi, Kaiti, Xingkai, ...) must be downloaded once in Font Book. Without them the skills still work, with plainer type. Windows uses Yu Gothic, Yu Mincho and Meiryo instead. `bash setup.sh --check` only reports and installs nothing.
 
 ## Use
 Tell Claude where the footage is, for example "edit ~/Movies/talk.mov for YouTube", "make three Shorts from this video" or "make a Reels ad from these clips and our logo". Claude looks at the footage, asks its questions, checks stills, and shares a light copy of the first video before finishing the rest.

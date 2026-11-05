@@ -13,6 +13,7 @@ S="${CLAUDE_SKILL_DIR}/scripts"   # このスキルの scripts フォルダ（�
 PY=$(bash "$S/env.sh")          # 専用のPython環境（初回は自動作成）。--check で ffmpeg / 音声エンジン等も確認
 ```
 - 初めて使うマシンでは、先に `bash "$S/setup.sh"` を実行する（ffmpeg・Python環境・HDR変換表・フォントの確認。足りないものは Homebrew で入れる。`--check` なら確認だけ）。
+- Windows でも同じ手順で動く（Claude Code が Git Bash で実行する。Git for Windows が必要）。`"$PY"` は UTF-8 で動く起動用スクリプトなので、そのまま使う。書き出しは Mac より遅い。
 
 ## 進め方
 

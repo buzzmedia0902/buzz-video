@@ -28,6 +28,7 @@ import glob
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -42,6 +43,9 @@ from core import media  # noqa: E402
 
 LOCAL = {"aivis": ("~/.local/opt/aivisspeech_engine-*", 10101, 497929760),
          "voicevox": ("~/.local/opt/voicevox_engine-*", 50021, 8)}
+# where the Windows installers put the engines (the app being open also works: its engine answers on the port)
+LOCAL_WIN = {"aivis": "~/AppData/Local/Programs/AivisSpeech/AivisSpeech-Engine",
+             "voicevox": "~/AppData/Local/Programs/VOICEVOX/vv-engine"}
 WHISPER_MODELS = ("~/.local/share/whisper/ggml-large-v3-turbo-q5_0.bin", "~/.local/share/whisper/ggml-small.bin")
 PASS = 0.8  # transcript similarity needed to accept a take
 
@@ -54,6 +58,8 @@ class LocalEngine:
         pattern, self.port, self.default = LOCAL[name]
         self.name, self.url, self.proc = name, f"http://127.0.0.1:{self.port}", None
         dirs = sorted(glob.glob(os.path.expanduser(pattern)))
+        if os.name == "nt":
+            dirs += [d for d in [os.path.expanduser(LOCAL_WIN[name])] if os.path.isdir(d)]
         self.dir = dirs[-1] if dirs else None
 
     def alive(self) -> bool:
@@ -69,7 +75,7 @@ class LocalEngine:
         if not self.dir:
             raise SystemExit(f"{self.name} engine not found ({LOCAL[self.name][0]})")
         log = open(os.path.join(os.path.dirname(self.dir), f"{self.name}_engine.log"), "a")
-        self.proc = subprocess.Popen([os.path.join(self.dir, "run"), "--host", "127.0.0.1", "--port", str(self.port)],
+        self.proc = subprocess.Popen([os.path.join(self.dir, "run.exe" if os.name == "nt" else "run"), "--host", "127.0.0.1", "--port", str(self.port)],
                                      cwd=self.dir, stdout=log, stderr=log)
         for _ in range(120):
             if self.alive():
@@ -106,7 +112,7 @@ class HiggsfieldEngine:
     """ElevenLabs v4 via the Higgsfield CLI: submit without --wait, poll, download (the CLI's --wait hangs)."""
 
     def __enter__(self) -> "HiggsfieldEngine":
-        if subprocess.run(["which", "higgsfield"], capture_output=True).returncode != 0:
+        if not shutil.which("higgsfield"):
             raise SystemExit("higgsfield CLI not found (npm i -g @higgsfield/cli; higgsfield auth login)")
         return self
 
@@ -193,7 +199,7 @@ def _norm(s: str) -> str:
 
 def transcribe(wav: str) -> str | None:
     model = next((os.path.expanduser(m) for m in WHISPER_MODELS if os.path.exists(os.path.expanduser(m))), None)
-    if not model or subprocess.run(["which", "whisper-cli"], capture_output=True).returncode != 0:
+    if not model or not shutil.which("whisper-cli"):
         return None
     with tempfile.TemporaryDirectory() as d:
         w16 = os.path.join(d, "a.wav")
@@ -224,7 +230,7 @@ def finish_line(raw: str, out: str, tempo: float) -> float:
         src = trimmed
         if abs(tempo - 1.0) > 1e-3:
             fast = os.path.join(d, "fast.wav")
-            if subprocess.run(["which", "rubberband"], capture_output=True).returncode == 0:
+            if shutil.which("rubberband"):
                 subprocess.run(["rubberband", "--fine", "--tempo", f"{tempo}", "-q", trimmed, fast], check=True)
             else:
                 subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", trimmed, "-af", f"atempo={tempo}", fast], check=True)

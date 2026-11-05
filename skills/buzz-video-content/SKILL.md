@@ -13,6 +13,7 @@ S="${CLAUDE_SKILL_DIR}/scripts"   # このスキルの scripts フォルダ（�
 PY=$(bash "$S/env.sh")          # 専用のPython環境（初回は自動作成）。--check で外部ツールも確認
 ```
 - 初めて使うマシンでは、先に `bash "$S/setup.sh"` を実行する（ffmpeg・Whisper とそのモデル・フォント・HDR変換表をそろえる。足りないものは Homebrew で入れる。`--check` なら確認だけ）。
+- Windows でも同じ手順で動く（Claude Code が Git Bash で実行する。Git for Windows が必要）。`"$PY"` は UTF-8 で動く起動用スクリプトなので、そのまま使う。顔検出は Apple Vision の代わりに MediaPipe（初回に自動で環境を作る）、書き出しは Mac より遅い。
 - 「buzz-video のセットアップ」を頼まれたら、広告スキルの分もまとめて `bash "$S/../../../setup.sh"` を実行する（このファイルがない場合は `bash "$S/setup.sh"`）。結果の NG・-- の行を短く伝え、Font Book でのダウンロードが必要なフォントがあれば名前を伝える。
 
 ## 進め方

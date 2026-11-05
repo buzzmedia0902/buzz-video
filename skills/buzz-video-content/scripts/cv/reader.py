@@ -11,6 +11,7 @@ import tempfile
 import numpy as np
 
 from cv import media
+from cv import osdep
 from cv.canvas import FPS, fps_arg
 
 ROT = {90: "transpose=1,", 180: "hflip,vflip,", 270: "transpose=2,"}
@@ -44,7 +45,7 @@ def vf(path: str, view: dict, speed: float, grade: str) -> str:
     crop = f"{ROT.get(view.get('rot', 0), '')}crop={cw}:{ch}:{cx}:{cy},"
     if info["hlg"]:
         return (f"{head}{crop}scale={ow}:{oh}:flags=lanczos:in_color_matrix=bt2020,{mi}format=rgb48le,"
-                f"lut3d=file='{media.hlg_lut()}':interp=tetrahedral,format=rgba")
+                f"lut3d=file='{osdep.ffpath(media.hlg_lut())}':interp=tetrahedral,format=rgba")
     g = f"{grade}," if grade else ""
     # the input range comes from the stream (full-range iPhone Cinematic / yuvj clips must not be stretched)
     return (f"{head}{crop}scale={ow}:{oh}:flags=lanczos:in_color_matrix=bt709:out_range=full,"
@@ -65,7 +66,7 @@ class Reader:
                    "-f", "rawvideo", "-"]
         else:
             dur = (shot.n - k0 + 2) / FPS * shot.speed + 0.3
-            cmd = ["ffmpeg", "-v", "error", "-hwaccel", "videotoolbox", "-ss", f"{max(0.0, start):.4f}", "-t",
+            cmd = ["ffmpeg", "-v", "error", *osdep.hwaccel(), "-ss", f"{max(0.0, start):.4f}", "-t",
                    f"{dur:.4f}", "-i", path, "-map", "0:v:0", "-vf", vf(path, shot.view, shot.speed, grade),
                    "-frames:v", str(self.left), "-f", "rawvideo", "-"]
         self.err = tempfile.TemporaryFile()
