@@ -26,13 +26,18 @@
 
 ## Install
 
-### Option 1: as a Claude Code plugin (recommended)
-```
-/plugin marketplace add buzzmedia0902/buzz-video
-/plugin install buzz-video@buzz-video
-```
+### Option 1: from the Claude app (recommended)
+No terminal needed. In the Claude desktop app's **Code** tab, open a new session (any folder) and ask:
+> Install the buzz-video plugin with: `claude plugin install buzz-video --marketplace buzzmedia0902/buzz-video`
 
-### Option 2: into your skills folder
+Then **open a new session** (plugins load from the next session) and ask Claude to "set up buzz-video".
+
+In the terminal, run the same command in your shell, or `/plugin install buzz-video --marketplace buzzmedia0902/buzz-video` inside a session.
+
+### Update
+Ask Claude in the app to "update buzz-video": it runs `claude plugin marketplace update buzz-video` and `claude plugin update buzz-video@buzz-video`. The next session uses the new version.
+
+### Option 2: into your skills folder (for developers)
 ```bash
 git clone https://github.com/buzzmedia0902/buzz-video.git ~/buzz-video
 mkdir -p ~/.claude/skills

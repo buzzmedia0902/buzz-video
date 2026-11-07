@@ -26,14 +26,18 @@
 
 ## インストール
 
-### 方法1：Claude Code のプラグインとして（おすすめ）
-Claude Code で次の2行を実行します。
-```
-/plugin marketplace add buzzmedia0902/buzz-video
-/plugin install buzz-video@buzz-video
-```
+### 方法1：Claude のアプリから（おすすめ）
+ターミナルは使いません。Claude デスクトップアプリの「Code」タブで、新しいセッションを開いて（フォルダはどこでも構いません）次のように頼みます。
+> 次のコマンドで buzz-video のプラグインを入れて：`claude plugin install buzz-video --marketplace buzzmedia0902/buzz-video`
 
-### 方法2：スキルのフォルダに置く
+入ったら、**新しいセッションを開きます**（プラグインは次のセッションから読み込まれます）。続けて「buzz-video のセットアップをして」と頼めば準備完了です。
+
+ターミナル版の Claude Code では、同じコマンドをシェルで実行するか、セッションの中で `/plugin install buzz-video --marketplace buzzmedia0902/buzz-video` を実行します。
+
+### 最新版にする
+アプリで「buzz-video を最新にして」と頼むと、Claude が `claude plugin marketplace update buzz-video` と `claude plugin update buzz-video@buzz-video` を実行します。新しいセッションから反映されます。
+
+### 方法2：スキルのフォルダに置く（開発する人向け）
 ```bash
 git clone https://github.com/buzzmedia0902/buzz-video.git ~/buzz-video
 mkdir -p ~/.claude/skills

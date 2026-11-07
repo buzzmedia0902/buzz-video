@@ -1,7 +1,7 @@
 {
   "name": "buzz-video",
   "displayName": "BUZZ VIDEO",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Claude が動画を編集するスキル集。発信動画（YouTube・ショート・切り抜き・Vlog）と SNS 広告動画を、トンマナを選択式で聞いてから、テロップ・オリジナルBGM・音量調整・サムネまで仕上げる（macOS）",
   "author": {"name": "BUZZ MEDIA", "url": "https://github.com/buzzmedia0902"},
   "homepage": "https://github.com/buzzmedia0902/buzz-video",
