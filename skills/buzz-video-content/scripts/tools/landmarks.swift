@@ -3,9 +3,11 @@
 //                          "eye": open ratio (eye height / width, mean of both), "eye_l": ..., "eye_r": ...,
 //                          "mouth_open": inner lips height / face height, "mouth_w": outer lips width / face width,
 //                          "lift": mouth corners above the lip centre / face height (> 0 smiles),
-//                          "brow": eyebrows above the eyes / face height}]}
+//                          "brow": eyebrows above the eyes / face height,
+//                          "quality": Vision face capture quality 0-1 (low when the face is covered by a hand,
+//                                     blurred, turned or looking down; -1 when Vision gives none)}]}
 // box is normalised with origin top-left (like faces.swift); every other number is a ratio. Used by thumb.py to pick
-// the face of a thumbnail: eyes open, a real smile, an open mouth for a reaction.
+// the face of a thumbnail: eyes open, a real smile, an open mouth for a reaction, nothing in front of the face.
 import AppKit
 import Foundation
 import Vision
@@ -28,8 +30,19 @@ for name in files {
     let req = VNDetectFaceLandmarksRequest()
     let handler = VNImageRequestHandler(cgImage: cg, options: [:])
     try? handler.perform([req])
+    let found = req.results ?? []
+    let qreq = VNDetectFaceCaptureQualityRequest()
+    qreq.inputFaceObservations = found
+    try? handler.perform([qreq])
+    let rated = qreq.results ?? []
+    func captureQuality(_ o: VNFaceObservation) -> Double {   // the rated face nearest to this one
+        let c = CGPoint(x: o.boundingBox.midX, y: o.boundingBox.midY)
+        let best = rated.min(by: { hypot($0.boundingBox.midX - c.x, $0.boundingBox.midY - c.y)
+                                   < hypot($1.boundingBox.midX - c.x, $1.boundingBox.midY - c.y) })
+        return Double(best?.faceCaptureQuality ?? -1)
+    }
     var faces: [[String: Any]] = []
-    for o in (req.results ?? []) {
+    for o in found {
         let b = o.boundingBox
         let bw = Double(b.width) * Double(cg.width), bh = Double(b.height) * Double(cg.height)
         // landmark points are normalised to the face box: scale to pixels so the ratios keep their aspect
@@ -55,6 +68,7 @@ for name in files {
             "mouth_w": extent(outer).w / bw,
             "lift": lift,
             "brow": brows.isEmpty || el.isEmpty ? 0 : (meanY(brows) - eyeY) / bh,
+            "quality": captureQuality(o),
         ])
     }
     let data = try JSONSerialization.data(withJSONObject: ["f": name, "faces": faces])

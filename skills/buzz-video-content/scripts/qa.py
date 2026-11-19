@@ -27,6 +27,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
 MIN_SHOW = 1.2
+SHRINK_WARN = 0.9            # a subtitle drawn below this share of the tone's size counts as shrunk (noticeable)
 DUP_ABS = 0.35               # mean |difference| (0-255, 192 px wide gray) below which two frames are the same
 JUDDER_REL = 0.2             # ... and below this fraction of the local median step, with real motion around
 
@@ -84,9 +85,12 @@ def subtitle_stats(subs: list[dict]) -> dict:
         return {"subtitles": 0}
     dur = np.array([s["t1"] - s["t0"] for s in subs])
     cps = np.array([C.n_chars(s["text"]) / max(d, 1e-3) for s, d in zip(subs, dur)])
+    shrunk = [s for s in subs if s.get("scale", 1.0) < SHRINK_WARN]
     return {"subtitles": len(subs), "subtitle_min_s": round(float(dur.min()), 2),
             "subtitles_shorter_than_1_2s": int((dur < MIN_SHOW - 1e-3).sum()),
-            "chars_per_s_p95": round(float(np.percentile(cps, 95)), 1), "chars_per_s_max": round(float(cps.max()), 1)}
+            "chars_per_s_p95": round(float(np.percentile(cps, 95)), 1), "chars_per_s_max": round(float(cps.max()), 1),
+            "subtitles_shrunk": len(shrunk),
+            "subtitles_shrunk_at": [[round(s["t0"], 2), s["scale"], C.plain(s["text"])] for s in shrunk[:8]]}
 
 
 def punch_ins(cues: dict, project: str | None, version: str | None) -> int | None:

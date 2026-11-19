@@ -84,20 +84,36 @@ def make_tracks(cues: dict, work_dir: str, seed: int, warns: list[str]):
     log(f"voice: {vo.info['dialogue_shots']} dialogue / {vo.info['ambience_shots']} ambience shots, "
         f"{vo.info['stretched']} stretched, noise {vo.info['noise']}")
     mus, minfo, style = None, {}, audio.get("bgm") or "none"
-    if style != "none":
+    if style == "file":
+        mus, minfo = music.from_file(audio["bgm_file"], cues["duration"], float(audio.get("bgm_from", 0.0)))
+        log(f"music: file {minfo['file']} from {minfo['start']:.1f} s" +
+            (f", looped {minfo['loops']}x (shorter than the video)" if minfo["loops"] else ""))
+        if minfo["loops"]:
+            warns.append(f"bgm file {minfo['file']} is shorter than the video and was looped {minfo['loops']}x: "
+                         f"listen to the joins or use a longer piece")
+        if audio.get("bpm_unknown"):
+            warns.append(f"the cuts snap to a {float(audio.get('bpm', 0)):.0f} BPM grid (snap: beat) but the bgm file's "
+                         f"tempo is unknown: set bgm.bpm to the file's tempo")
+    elif style != "none":
         if style not in music.STYLES:
-            raise SystemExit(f"bgm style {style!r} is not one of {', '.join(music.STYLES)} (or none)")
+            raise SystemExit(f"bgm style {style!r} is not one of {', '.join(music.STYLES)}, file or none")
         mus, minfo = music.compose(style, cues["duration"], cues.get("sections", []), bpm=audio.get("bpm"), seed=seed,
                                    mood=audio.get("mood"))
         log(f"music: {style} {minfo['bpm']:.1f} BPM, key {minfo['key']}, {len(minfo['beats'])} beats")
     sf = None
-    if cues.get("sfx") and (audio.get("sfx") or "none") != "none":
-        if audio["sfx"] not in sfx.SETS:
-            raise SystemExit(f"sfx set {audio['sfx']!r} is not one of {', '.join(sfx.SETS)}")
+    files = audio.get("sfx_files") or {}
+    set_name = audio.get("sfx") or "none"
+    if cues.get("sfx") and (set_name != "none" or files):
+        if set_name not in sfx.SETS:
+            raise SystemExit(f"sfx set {set_name!r} is not one of {', '.join(sfx.SETS)}")
         if sfx.unknown_names(cues["sfx"]):
             warns.append(f"sfx names skipped (unknown): {', '.join(sfx.unknown_names(cues['sfx']))}")
-        sf = sfx.render(audio["sfx"], cues["sfx"], cues["duration"], float(audio.get("sfx_db", 0.0)), seed)
-        log(f"sfx: {len(cues['sfx'])} events ({audio['sfx']})")
+        bad = sfx.unknown_names([[0, k] for k in files])
+        if bad:
+            raise SystemExit(f"sfx.files: unknown sound names {', '.join(bad)} (use {', '.join(sorted(sfx.PEAK_DB))})")
+        sf = sfx.render(set_name, cues["sfx"], cues["duration"], float(audio.get("sfx_db", 0.0)), seed, files=files)
+        log(f"sfx: {len(cues['sfx'])} events ({set_name}" + (f"; files for {', '.join(sorted(files))}" if files else "")
+            + ")")
     return vo, mus, minfo, sf
 
 
@@ -181,7 +197,25 @@ def chapter_list(cues: dict) -> tuple[list[str], list[str]]:
     return [f"{ts(t)} {label}" for t, label in ch], warns
 
 
-def write_deliverables(cues: dict, master: str, aac: str, stem: str, no_light: bool, wd: str, warns: list[str]) -> dict:
+def clean_cover(wd: str, cues: dict, edit_path: str | None, warns: list[str]) -> str | None:
+    """thumb.py's cover A of a 9:16 version (recorded in work/<version>/cover.json), None when there is none."""
+    if cues.get("aspect") != "9:16":
+        return None
+    try:
+        rec = json.load(open(os.path.join(wd, "cover.json"), encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    png = rec.get("png")
+    if not png or not os.path.exists(png):
+        return None
+    if edit_path and os.path.getmtime(edit_path) > float(rec.get("edit_mtime", 0.0)) + 1.0:
+        warns.append("the cover was made before the last edit.json change: re-run thumb.py if the title or the cut "
+                     "changed")
+    return png
+
+
+def write_deliverables(cues: dict, master: str, aac: str, stem: str, no_light: bool, wd: str, warns: list[str],
+                       edit_path: str | None = None) -> dict:
     """Video, light copy, subtitles and chapter list / cover; returns {kind: path}."""
     from cv import cues as C
     fmt = cues["format"]
@@ -193,7 +227,7 @@ def write_deliverables(cues: dict, master: str, aac: str, stem: str, no_light: b
         if fmt != "youtube" and light["size_mb"] >= 30:
             warns.append(f"light copy is {light['size_mb']} MB (limit 30 MB)")
     out["srt"] = stem + "_字幕.srt"
-    C.to_srt([C.Sub(**s) for s in cues.get("subs", [])], out["srt"])
+    C.to_srt([C.Sub(s["t0"], s["t1"], s["text"], s.get("speaker")) for s in cues.get("subs", [])], out["srt"])
     if fmt == "youtube":
         lines, cw = chapter_list(cues)
         out["description"] = stem + "_概要欄.txt"
@@ -202,8 +236,17 @@ def write_deliverables(cues: dict, master: str, aac: str, stem: str, no_light: b
         warns += cw
     else:
         out["cover"] = stem + "_カバー.png"
-        subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", "1.0", "-i", out["video"], "-frames:v", "1", out["cover"]],
-                       check=True)
+        png = clean_cover(wd, cues, edit_path, warns)
+        if png:       # thumb.py's cover A: a clean frame (no subtitle), title inside the 3:4 profile-grid area
+            import shutil
+            shutil.copyfile(png, out["cover"])
+        else:
+            subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", "1.0", "-i", out["video"], "-frames:v", "1",
+                            out["cover"]], check=True)
+            if cues.get("aspect") == "9:16":
+                warns.append(f"the cover is the video's frame at 1 s (a subtitle may be on it): run thumb.py --version "
+                             f"{cues['version']} --copy \"…\" for a clean cover; it replaces "
+                             f"{os.path.basename(out['cover'])}")
     return out
 
 
@@ -253,13 +296,19 @@ def main() -> None:
     os.makedirs(project.out_dir, exist_ok=True)
     stem = os.path.join(project.out_dir, f"{project.name.replace('/', '_')}_{spec.FORMAT_JA[cues['format']]}_"
                                          f"{spec.TONE_JA[cues['tone']]}_{tag}_{length_ja(cues['duration'])}")
-    outputs = write_deliverables(cues, master, aac, unique_stem(stem, project.work_dir, a.version), a.no_light, wd, warns)
-    for w in warns:
-        log(f"warning: {w}")
+    outputs = write_deliverables(cues, master, aac, unique_stem(stem, project.work_dir, a.version), a.no_light, wd, warns,
+                                 edit_path=a.project)
     rep = qa.report(outputs["video"], cues, loud=(meas["I"], meas["TP"]), project=a.project, version=a.version)
+    if rep.get("subtitles_shrunk"):
+        cap = cues.get("sub_capacity")
+        warns.append(f"{rep['subtitles_shrunk']} subtitles are drawn smaller because no two-line layout fits"
+                     f"{f' ({cap} characters a line)' if cap else ''}: split or shorten them in cues.json - "
+                     + ", ".join(f"{t:.1f} s 「{x}」" for t, _, x in rep.get("subtitles_shrunk_at", [])[:3]))
     if rep.get("judder_frames"):
         warns.append(f"{rep['judder_frames']} repeated frames inside shots (a 24 / 25 fps or Auto-FPS clip in a "
                      f"{cues['fps']:.2f} fps edit?): add \"smooth\": true to those parts and re-render")
+    for w in warns:
+        log(f"warning: {w}")
     rep.update(version=a.version, outputs=outputs, warnings=warns, seed=seed, voice=vo.info,
                bgm={k: v for k, v in minfo.items() if k != "beats"}, mix={**mixed.info, **minf, "attempts": attempts},
                seconds=round(time.time() - t_start, 1))

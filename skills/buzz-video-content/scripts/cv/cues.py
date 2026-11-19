@@ -6,7 +6,9 @@ cues.json: [{"src": "talk", "t0": 12.3, "t1": 14.8, "text": "AIで{動画編集}
   "cut": true   keeps the cue out of the picture (e.g. a retake you also listed in a part's "remove")
 
 Rules from viewer feedback: every subtitle stays >= MIN_SHOW s (grown into the silence around it, else joined to a
-neighbour, max 40 characters / 2 lines), and pure fillers are trimmed from the text only (the audio keeps them).
+neighbour, at most two lines of what the tone fits unshrunk: render.py passes 2 x Look.sub_capacity(), about 20
+characters in 9:16 and the 40-character cap in 16:9), and pure fillers are trimmed from the text only (the audio
+keeps them).
 """
 from __future__ import annotations
 
@@ -58,8 +60,9 @@ def n_chars(text: str) -> int:
     return len(plain(text))
 
 
-def min_show(subs: list[Sub], spans: list[tuple[float, float]], min_s: float) -> list[Sub]:
-    """Every subtitle >= min_s: grow it into the silence around it (never past its part), else join a neighbour."""
+def min_show(subs: list[Sub], spans: list[tuple[float, float]], min_s: float, merge_max: int = MERGE_MAX) -> list[Sub]:
+    """Every subtitle >= min_s: grow it into the silence around it (never past its part), else join a neighbour
+    (only while the pair stays within merge_max characters, i.e. two unshrunk lines)."""
     out = [Sub(s.t0, s.t1, s.text, s.speaker) for s in subs]
     for i, cu in enumerate(out):
         if cu.t1 - cu.t0 >= min_s:
@@ -74,7 +77,7 @@ def min_show(subs: list[Sub], spans: list[tuple[float, float]], min_s: float) ->
 
     def joinable(a: Sub, b: Sub) -> bool:  # same speaker, same part, short gap, two single phrases that fit
         return b.t0 - a.t1 < 0.6 and a.speaker == b.speaker and span(a) == span(b) and \
-            JOIN not in a.text and JOIN not in b.text and n_chars(a.text + b.text) <= MERGE_MAX
+            JOIN not in a.text and JOIN not in b.text and n_chars(a.text + b.text) <= merge_max
 
     joined = True
     while joined:
@@ -111,7 +114,7 @@ def shows_subs(part: dict, fmt: str = "youtube") -> bool:
     return audio_mode(part, fmt) == "keep"
 
 
-def for_version(cues: list[dict], tl, min_s: float, do_tidy: bool = True) -> list[Sub]:
+def for_version(cues: list[dict], tl, min_s: float, do_tidy: bool = True, merge_max: int = MERGE_MAX) -> list[Sub]:
     """Cues of the sources this version plays, mapped to output seconds, tidied, >= min_s where possible."""
     subs = []
     parts, fmt = tl.version["parts"], tl.version["format"]
@@ -132,7 +135,7 @@ def for_version(cues: list[dict], tl, min_s: float, do_tidy: bool = True) -> lis
     for a, b in zip(subs, subs[1:]):  # no overlaps
         if b.t0 < a.t1:
             a.t1 = max(a.t0 + 0.05, b.t0)
-    return min_show(subs, tl.talk_spans(), min_s)
+    return min_show(subs, tl.talk_spans(), min_s, merge_max)
 
 
 def at(subs: list[Sub], t: float) -> Sub | None:

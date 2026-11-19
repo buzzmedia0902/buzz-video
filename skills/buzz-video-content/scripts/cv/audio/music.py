@@ -105,6 +105,28 @@ def compose(style: str, duration: float, sections=(), bpm: float | None = None, 
     return out.astype(np.float32), info
 
 
+def from_file(path: str, duration: float, start: float = 0.0, fade_out: float = 1.5) -> tuple[np.ndarray, dict]:
+    """A prepared or generated piece as the BGM (instead of composing one): from `start` s into the file, looped with
+    a 2 s crossfade while it is shorter than the video, 8 ms fade-in, faded out over the last `fade_out` s. The mix
+    sets its level under the voice exactly like a composed track."""
+    import os
+    src = dsp.read_audio(path)[:, dsp.n_of(start):]
+    if src.shape[1] < dsp.n_of(1.0):
+        raise SystemExit(f"bgm file {path} has less than 1 s of audio after {start:.1f} s")
+    n, x, loops = dsp.n_of(duration), src, 0
+    while x.shape[1] < n:
+        k = min(dsp.n_of(2.0), src.shape[1] // 2, x.shape[1] // 2)
+        ramp = np.linspace(0.0, 1.0, k, dtype=np.float32)[None, :]
+        x = np.concatenate([x[:, :-k], x[:, -k:] * (1.0 - ramp) + src[:, :k] * ramp, src[:, k:]], axis=1)
+        loops += 1
+    out = np.ascontiguousarray(x[:, :n], dtype=np.float32)
+    head, tail = min(dsp.n_of(0.008), n), min(dsp.n_of(fade_out), n)
+    out[:, :head] *= np.linspace(0.0, 1.0, head, dtype=np.float32)[None, :]
+    out[:, n - tail:] *= np.linspace(1.0, 0.0, tail, dtype=np.float32)[None, :]
+    return out, {"style": "file", "file": os.path.basename(path), "start": round(float(start), 2), "loops": loops,
+                 "bpm": None, "key": None, "beats": []}
+
+
 def _fade_edges(out: np.ndarray, plan: form.Plan) -> None:
     """In place: 8 ms fade-in; after the landing the ring-out fades to exactly zero at the last sample."""
     head = dsp.n_of(0.008)
