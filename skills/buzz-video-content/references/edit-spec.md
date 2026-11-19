@@ -48,8 +48,8 @@
 | `overlays` | 見出し・カード・強調ワードなど（下記） |
 | `cut` | ジェットカットの上書き：`{"pause": 0.32, "tail": 0.11, "lead": 0.08, "speed": 1.1}` |
 | `camera` | 画面の動きの上書き：`{"hold": 10, "med": 1.14, "punch_every": 40, "punch_zoom": 1.08}` |
-| `bgm` | BGMの上書き：`{"style": "pop", "music_db": -12, "bpm": 110}` |
-| `sfx` | false で効果音なし |
+| `bgm` | BGMの上書き：`{"style": "pop", "music_db": -12, "bpm": 110}`。用意した曲・生成した曲を使うときは `{"file": "audio/bgm.mp3", "from": 0}`（`from` は曲の何秒目から使うか） |
+| `sfx` | false で効果音なし。用意した音・生成した音を使うときは `{"files": {"pop": "audio/pop.wav", "whoosh": "audio/whoosh.wav"}}`（指定のない音はトンマナの音） |
 | `snap` | `"beat"` でVlogのクリップの長さを曲の拍に合わせる |
 | `subs` | false で字幕を出さない（テロップなし。タイトル・名札・カードは出る） |
 | `look` | このversionだけの見た目の調整（下記） |

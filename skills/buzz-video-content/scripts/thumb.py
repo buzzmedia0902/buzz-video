@@ -85,7 +85,7 @@ def best_frame(path: str, rot: int, t: float, role: str, work: str):
     from cv.thumbs import scan as S
     cache_path = os.path.join(work, "picks.json")
     cache = json.load(open(cache_path)) if os.path.exists(cache_path) else {}
-    key = f"{role}@{t:.3f}@{os.path.getmtime(os.path.expanduser(path)):.0f}"
+    key = f"{role}@{t:.3f}@{os.path.getmtime(os.path.expanduser(path)):.0f}@v{S.SCAN_VERSION}"
     hit = cache.get(key)
     if hit and os.path.exists(hit["path"]):
         return S.Frame(**{**hit, "face": tuple(hit["face"])})
@@ -326,6 +326,30 @@ def main() -> None:
         print(f"  {i} {m['label']:<8} 顔 {m['t']:>6.1f}s  {os.path.basename(m['jpg'])} ({m['kb']} KB)")
     print(f"  スマホのフィードでの見え方: {feed_path}")
     print(f"  顔の一覧（選び直すとき --times）: {sheet}")
+    if not wide and made:
+        json.dump({"png": made[0]["png"], "edit_mtime": os.path.getmtime(p.path)},
+                  open(p.work(a.version, "cover.json"), "w"), ensure_ascii=False, indent=1)   # read by finish.py
+        if os.environ.get("CV_ASPECT") == "9:16":   # the covers are 9:16: other ratios keep a frame of their own shape
+            cover = replace_delivered_cover(p, a.version, made[0]["png"])
+            if cover:
+                print(f"  納品のカバーを差し替え（{made[0]['label']}）: {cover}")
+
+
+def replace_delivered_cover(p, version: str, png: str) -> str | None:
+    """finish.py already delivered <stem>_カバー.png (the video's frame at 1 s, with a subtitle on it): put the clean
+    cover A in its place. Returns the replaced path, None when there is nothing to replace yet."""
+    import glob
+    import shutil
+    replaced = None
+    for rep in glob.glob(os.path.join(p.work_dir, version, "report_*.json")):
+        try:
+            cover = json.load(open(rep, encoding="utf-8")).get("outputs", {}).get("cover")
+        except (OSError, ValueError):
+            continue
+        if cover and os.path.exists(cover):
+            shutil.copyfile(png, cover)
+            replaced = cover
+    return replaced
 
 
 if __name__ == "__main__":

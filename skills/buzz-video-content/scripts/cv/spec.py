@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import os
+import subprocess
 from dataclasses import dataclass, field
 
 FORMATS = ("youtube", "short", "clip", "vlog")
@@ -64,6 +65,10 @@ class Project:
         os.makedirs(os.path.dirname(p), exist_ok=True)
         return p
 
+    def path_of(self, p: str) -> str:
+        """A path written in edit.json (relative to it, ~ allowed) as an absolute path."""
+        return _abs(self.root, p)
+
 
 def _abs(root: str, p: str) -> str:
     p = os.path.expanduser(p)
@@ -101,11 +106,53 @@ def load(path: str) -> Project:
     versions = raw["versions"]
     for name, v in versions.items():
         _check_version(name, v, sources)
+        _check_audio(name, v, root)
     cues = raw.get("cues")
     return Project(path=path, root=root, name=raw["project"], tone=tone, brand=brand, sources=sources,
                    speakers=raw.get("speakers", {}), cues_path=_abs(root, cues) if cues else None,
                    look=raw.get("look", {}), out_dir=_abs(root, raw.get("out_dir", "納品")),
                    work_dir=_abs(root, raw.get("work_dir", "work")), versions=versions, raw=raw)
+
+
+def _check_audio(name: str, v: dict, root: str) -> None:
+    """"bgm": {"style" | "file" + "from", "music_db", ...} and "sfx": true / false / {"files": {name: path}}."""
+    where = f"versions.{name}"
+    bgm = v.get("bgm", {})
+    if not isinstance(bgm, dict):
+        raise SpecError(f'{where}.bgm must be an object, e.g. {{"style": "pop"}} or {{"file": "audio/bgm.mp3"}}')
+    if "file" in bgm:
+        _check_audio_file(f"{where}.bgm.file", bgm["file"], root)
+        try:
+            start = float(bgm.get("from", 0.0))
+        except (TypeError, ValueError):
+            raise SpecError(f"{where}.bgm.from must be seconds into the file (a number)") from None
+        if start < 0:
+            raise SpecError(f"{where}.bgm.from (seconds into the file) must be >= 0")
+    sfx = v.get("sfx", True)
+    if isinstance(sfx, dict):
+        files = sfx.get("files", {})
+        if not isinstance(files, dict):
+            raise SpecError(f'{where}.sfx.files must map a sound name to a file, e.g. {{"pop": "audio/pop.wav"}}')
+        if files:
+            from cv.audio import sfx as S  # only projects that bring their own sounds pay for this import
+            bad = S.unknown_names([[0, k] for k in files])
+            if bad:
+                raise SpecError(f"{where}.sfx.files: unknown sound name(s) {', '.join(bad)} "
+                                f"(use {', '.join(sorted(S.PEAK_DB))})")
+        for snd, p in files.items():
+            _check_audio_file(f"{where}.sfx.files.{snd}", p, root)
+    elif not isinstance(sfx, bool):
+        raise SpecError(f'{where}.sfx must be true, false or {{"files": {{...}}}}')
+
+
+def _check_audio_file(where: str, p, root: str) -> None:
+    """A prepared sound must be a file with an audio stream (checked before minutes of rendering)."""
+    if not isinstance(p, str) or not p.strip() or not os.path.isfile(_abs(root, p)):
+        raise SpecError(f"{where}: not a file: {p!r}")
+    out = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "a", "-show_entries", "stream=codec_type",
+                          "-of", "csv=p=0", _abs(root, p)], capture_output=True, text=True)
+    if out.returncode != 0 or "audio" not in out.stdout:
+        raise SpecError(f"{where}: no audio stream in {p} {out.stderr.strip()[:160]}".rstrip())
 
 
 def _check_version(name: str, v: dict, sources: dict) -> None:

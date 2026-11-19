@@ -11,7 +11,7 @@ Pipeline: `edit.json` -> `render.py` (silent master, stills, sheets; writes `wor
 | `cv/timeline.py` | parts -> placed `Shot`s (talk = jet cut, clip = range, card = generated); src <-> output time |
 | `cv/framing.py` | crop / box per shot (cover or band), wide <-> medium camera plan, face track loader |
 | `cv/reader.py` | ffmpeg decode of a shot (speed, fps, rotation, HLG LUT, crop, scale, grade) -> RGBA |
-| `cv/cues.py` | cues.json -> output-time subtitles (tidy fillers, min show 1.2 s, joins), SRT |
+| `cv/cues.py` | cues.json -> output-time subtitles (tidy fillers, min show 1.2 s, joins up to two unshrunk lines: `Look.sub_capacity()`), SRT |
 | `cv/overlays.py` | authored overlays + format defaults (title band, credit) in output time |
 | `cv/layout.py` | face-aware placement (cards / name plates / big words), 9:16 card mode |
 | `cv/gfx.py` | skia kit: easing, paints, fonts by role key (`FAMILIES`), outlined text, images |
@@ -26,8 +26,8 @@ Pipeline: `edit.json` -> `render.py` (silent master, stills, sheets; writes `wor
 | `probe.py` | footage inventory, contact sheets, speech share, optional flash scan |
 | `thumb.py` + `cv/thumbs/` | YouTube thumbnails (3 directions) / 9:16 covers in the tone's look; face scan, Vision cut-out, feed preview |
 | `ref_probe.py` + `cv/refprobe/` | measures a reference video (cuts, pauses, speech rate, loudness, telops) -> nearest tone + `look` |
-| `finish.py` | voice cut like the picture + BGM + SFX + mix (-14 LUFS, TP <= -1 dBTP on the AAC), mux, light copy, SRT, 概要欄, cover, report |
-| `qa.py` | loudness, frames, judder, subtitle timing / reading speed, shot changes and punch-ins per minute |
+| `finish.py` | voice cut like the picture + BGM (composed, or a file: `bgm.file`) + SFX (set, or files: `sfx.files`) + mix (-14 LUFS, TP <= -1 dBTP on the AAC), mux, light copy, SRT, 概要欄, cover (thumb.py's cover A when made), report |
+| `qa.py` | loudness, frames, judder, subtitle timing / reading speed / shrunk subtitles, shot changes and punch-ins per minute |
 | `cv/audio/` | dsp (LUFS, true peak, limiter), music (original BGM: styles lofi / acoustic / pop / piano / ambient / wa, any length, exact bpm), sfx, voice, mix |
 | `tools/*.swift` | Apple Vision helpers compiled on first use into ~/.local/share/content-video/bin (faces, landmarks, lift, textboxes) |
 | tone `THUMB = {...}` | optional per-tone poster palette for thumbnails (cv/thumbs/theme.py) |

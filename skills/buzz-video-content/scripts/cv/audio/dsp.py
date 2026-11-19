@@ -356,6 +356,16 @@ def limit_true_peak(x: np.ndarray, ceiling_db: float = -1.0, look_ms: float = 3.
 
 
 # =================================================================== files
+def read_audio(path: str) -> np.ndarray:
+    """Any audio file ffmpeg reads (wav, mp3, m4a, ...) as stereo float32 (2, n) at 48 kHz."""
+    try:
+        raw = subprocess.run(["ffmpeg", "-v", "error", "-i", path, "-vn", "-ac", "2", "-ar", str(SR), "-f", "f32le", "-"],
+                             capture_output=True, check=True).stdout
+    except subprocess.CalledProcessError as e:
+        raise SystemExit(f"cannot read audio from {path}: {e.stderr.decode(errors='replace').strip()[:300]}") from None
+    return np.frombuffer(raw, np.float32).reshape(-1, 2).T.copy()
+
+
 def write_wav(path: str, x: np.ndarray) -> None:
     """(n,) or (c, n) float -> 32-bit float WAV at 48 kHz."""
     a = x if x.ndim == 1 else x.T

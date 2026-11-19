@@ -35,6 +35,7 @@ SET_OFFSET_DB = {"soft": -1.5, "cute": 0.0, "variety": 1.0, "wa": 0.0}
 # seconds a sweep runs before it is "heard" (its peak): the sound starts that much earlier than the event time
 PRE = {("soft", "whoosh"): 0.28, ("cute", "whoosh"): 0.23, ("variety", "whoosh"): 0.23, ("wa", "whoosh"): 0.28}
 ROOM_SEED = 5151
+FILE_SHOT_MAX = 3.0   # s: a prepared sound file longer than this is cut (with a short fade)
 
 
 def _mono2(x: np.ndarray) -> np.ndarray:
@@ -327,6 +328,21 @@ def one_shot(set_name: str, name: str, seed: int = 0) -> np.ndarray:
     return y[:, max(0, first - 2):] / (peak + 1e-12) * dsp.from_db(PEAK_DB[n] + SET_OFFSET_DB.get(set_name, 0.0))
 
 
+def file_shot(path: str, name: str, set_name: str = "soft") -> tuple[np.ndarray, float]:
+    """A sound file used as the one-shot `name`: lead silence trimmed, peak at that name's nominal level (like a
+    synthesised one); returns (stereo float, seconds from its start to its loudest moment)."""
+    n = canonical(name)
+    y = hp(dsp.read_audio(path).astype(float), 60.0, 2)
+    peak = float(np.abs(y).max())
+    if peak <= 0:
+        raise SystemExit(f"sfx file {path} is silent")
+    first = int(np.argmax(np.abs(y).max(axis=0) > peak * 10 ** (-50 / 20)))
+    y = y[:, max(0, first - 2):] / peak * dsp.from_db(PEAK_DB[n] + SET_OFFSET_DB.get(set_name, 0.0))
+    if y.shape[1] > n_of(FILE_SHOT_MAX):   # a whole track given as "pop" must not play on under the talk
+        y = y[:, :n_of(FILE_SHOT_MAX)] * fade_end(n_of(FILE_SHOT_MAX), n_of(0.05))
+    return y, float(np.argmax(np.abs(y).max(axis=0))) / SR
+
+
 def unknown_names(events) -> list[str]:
     """Event names no set knows (render skips them; the caller can warn)."""
     bad = []
@@ -338,19 +354,25 @@ def unknown_names(events) -> list[str]:
     return sorted(set(bad))
 
 
-def render(set_name: str, events, duration: float, sfx_db: float = 0.0, seed: int = 0) -> np.ndarray:
+def render(set_name: str, events, duration: float, sfx_db: float = 0.0, seed: int = 0,
+           files: dict | None = None) -> np.ndarray:
     """Place the events: stereo float32 of exactly round(duration * SR) samples (silence for set 'none'); events with an
-    unknown name are skipped."""
+    unknown name are skipped. `files` {name: path} replaces those names with prepared / generated sounds (their
+    loudest moment lands on the event time), also in set 'none'."""
     if set_name not in SETS:
         raise ValueError(f"unknown sfx set {set_name!r}; choose from {', '.join(SETS)}")
+    files = {canonical(k): v for k, v in (files or {}).items()}
     n = n_of(duration)
     bus = dsp.Bus(duration, tail=3.0)
-    if set_name != "none":
-        cache: dict[str, np.ndarray] = {}
-        for ev in sorted((e for e in events if str(e[1]) not in unknown_names([e])), key=lambda e: float(e[0])):
-            t, name = float(ev[0]), canonical(ev[1])
-            gain = float(ev[2]) if len(ev) > 2 and ev[2] is not None else 0.0
-            if name not in cache:
-                cache[name] = one_shot(set_name, name, seed)
-            bus.add(cache[name], max(0.0, t - PRE.get((set_name, name), 0.0)), gain=float(dsp.from_db(gain + sfx_db)))
+    cache: dict[str, tuple[np.ndarray, float]] = {}
+    for ev in sorted((e for e in events if str(e[1]) not in unknown_names([e])), key=lambda e: float(e[0])):
+        t, name = float(ev[0]), canonical(ev[1])
+        if name not in files and set_name == "none":
+            continue
+        gain = float(ev[2]) if len(ev) > 2 and ev[2] is not None else 0.0
+        if name not in cache:
+            cache[name] = file_shot(files[name], name, set_name) if name in files else \
+                (one_shot(set_name, name, seed), PRE.get((set_name, name), 0.0))
+        shot, pre = cache[name]
+        bus.add(shot, max(0.0, t - pre), gain=float(dsp.from_db(gain + sfx_db)))
     return (bus.st[:, :n] * fade_end(n, n_of(0.005))).astype(np.float32)

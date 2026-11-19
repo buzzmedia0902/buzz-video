@@ -5,6 +5,8 @@ Lessons from the first YouTube thumbnails (all from a 1.5 s face-crop scan of th
   * then take the sharpest frame (Laplacian variance of the face) within +-0.3 s of the pick
   * reject blurred hands: moving hands smear, so the frame-to-frame change below the face must be small
   * the face must be whole, frontal enough and large; the body must not be cut by the frame right under the chin
+  * nothing in front of the face: Apple Vision's face capture quality drops for a hand across the face, a blur, a
+    look down; frames well under the talk's median are not used, and the +-0.3 s pick prefers the cleanest face
 """
 from __future__ import annotations
 
@@ -28,6 +30,8 @@ BURST = 0.3
 ROT = {90: "transpose=1,", 180: "hflip,vflip,", 270: "transpose=2,"}
 CROP = 192        # face crops are compared at this size
 ROLES = ("reaction", "before_after", "authority")
+SCAN_VERSION = 2   # bump when the cached scan.json gains fields (2: capture quality)
+QUALITY_MIN = 0.6  # a face under this share of the talk's median capture quality is covered / blurred / looking away
 
 
 @dataclass
@@ -48,6 +52,7 @@ class Frame:
     mouth_w: float = 0.0           # outer lips width / face width
     lift: float = 0.0              # mouth corners above the lip centre (smile > 0.015)
     brow: float = 0.0              # eyebrows above the eyes
+    quality: float = -1.0          # Vision face capture quality 0-1 (-1 unknown, e.g. the MediaPipe fallback)
     score: float = 0.0
 
     @property
@@ -128,6 +133,13 @@ def detect_expressions(paths: list[str]) -> list[dict]:
 def _fill_expression(fr: "Frame", e: dict) -> None:
     for k in ("eye", "eye_l", "eye_r", "mouth_open", "mouth_w", "lift", "brow"):
         setattr(fr, k, float(e.get(k, 0.0)))
+    fr.quality = float(e.get("quality", -1.0))
+
+
+def median_quality(frames: list["Frame"]) -> float | None:
+    """The talk's typical capture quality (None when the helper gives none)."""
+    qs = [fr.quality for fr in frames if fr.face and fr.quality >= 0]
+    return float(np.median(qs)) if qs else None
 
 
 def _largest(fs: list[list[float]], size: tuple[int, int]):
@@ -186,7 +198,7 @@ def body_motion(paths: list[str], faces: list[tuple | None]) -> list[float]:
 
 
 # ---------------------------------------------------------------- the scan
-def usable(fr: Frame, frame_size: tuple[int, int], med_sharp: float) -> None:
+def usable(fr: Frame, frame_size: tuple[int, int], med_sharp: float, med_quality: float | None = None) -> None:
     """Gate a frame as thumbnail face (sets ok / why)."""
     w, h = frame_size
     if fr.face is None:
@@ -203,6 +215,8 @@ def usable(fr: Frame, frame_size: tuple[int, int], med_sharp: float) -> None:
         fr.ok, fr.why = False, "blurred"
     elif fr.blink:
         fr.ok, fr.why = False, "eyes shut"
+    elif med_quality and 0 <= fr.quality < QUALITY_MIN * med_quality:
+        fr.ok, fr.why = False, "face covered / looking away"
     else:
         fr.ok, fr.why = True, ""
 
@@ -210,7 +224,7 @@ def usable(fr: Frame, frame_size: tuple[int, int], med_sharp: float) -> None:
 def scan(path: str, rot: int, t0: float, t1: float, work: str, step: float = STEP, refresh: bool = False) -> list[Frame]:
     """Every `step` s of [t0, t1]: face, sharpness, size, expression numbers. Cached in work/scan.json."""
     cache = os.path.join(work, "scan.json")
-    key = [os.path.getmtime(os.path.expanduser(path)), t0, t1, step]
+    key = [os.path.getmtime(os.path.expanduser(path)), t0, t1, step, SCAN_VERSION]
     if not refresh and os.path.exists(cache):
         data = json.load(open(cache))
         if data["key"] == key and all(os.path.exists(r["path"]) for r in data["frames"]):
@@ -227,8 +241,9 @@ def scan(path: str, rot: int, t0: float, t1: float, work: str, step: float = STE
     for fr, e in zip(frames, detect_expressions(paths)):
         _fill_expression(fr, e)
     med = float(np.median([fr.sharp for fr in frames if fr.face])) if any(fr.face for fr in frames) else 1.0
+    med_q = median_quality(frames)
     for fr in frames:
-        usable(fr, size, med)
+        usable(fr, size, med, med_q)
     json.dump({"key": key, "size": size, "frames": [asdict(f) for f in frames]}, open(cache, "w"), indent=1)
     return frames
 
@@ -265,11 +280,14 @@ def sharpest(path: str, rot: int, t: float, work: str, role: str = "") -> Frame:
         _fill_expression(fr, e)
     motion = body_motion(paths, [fr.face for fr in frames])
     top = max((fr.sharp for fr in frames), default=1.0) or 1.0
+    top_q = max((fr.quality for fr in frames if fr.face), default=-1.0)
     expr = expression_scores(frames)
     bonus = expr["smile"] if role == "authority" else expr["reaction"] if role == "reaction" else np.zeros(len(frames))
     for fr, m, b in zip(frames, motion, np.clip(bonus, -3, 3)):
         fr.motion = m
         fr.score = (fr.sharp / top if fr.face else -9.0) - 0.04 * m - (0.8 if fr.blink else 0.0) + 0.06 * float(b)
+        if top_q > 0 and fr.quality >= 0:   # a hand passing in front of the face, a look down: the cleanest face wins
+            fr.score += 0.6 * fr.quality / top_q - (1.0 if fr.quality < QUALITY_MIN * top_q else 0.0)
     best = max(frames, key=lambda f: f.score)
     png = os.path.join(work, "frames", f"t{best.t:08.3f}.png")
     os.makedirs(os.path.dirname(png), exist_ok=True)
@@ -283,7 +301,8 @@ def sharpest(path: str, rot: int, t: float, work: str, role: str = "") -> Frame:
 
 # ---------------------------------------------------------------- roles
 def quality(fr: Frame) -> float:
-    return fr.sharp * (0.6 + fr.size) * (1.0 - min(abs(fr.yaw), 0.55) * 0.8) if fr.ok else 0.0
+    capture = 0.5 + fr.quality if fr.quality >= 0 else 1.0
+    return fr.sharp * (0.6 + fr.size) * (1.0 - min(abs(fr.yaw), 0.55) * 0.8) * capture if fr.ok else 0.0
 
 
 def pick_roles(frames: list[Frame], want: tuple = ROLES, gap: float = 3.0) -> dict[str, Frame]:
