@@ -36,7 +36,7 @@ PY=$(bash "$S/env.sh")          # 専用のPython環境（初回は自動作成�
 
 ### 4. 文字起こし → 直す → 時刻合わせ
 ```
-"$PY" "$S/transcribe.py" edit.json --max-chars 16     # 縦は14〜16字、横は18〜20字で区切る
+"$PY" "$S/transcribe.py" edit.json --max-chars 16     # 1つの字幕の長さ：縦は16字まで（2行に分かれる）、横は20字まで
 # cues.json を直す：固有名詞・聞き間違い・数字、強調は {AIの動画編集}、言い直しは "cut": true
 "$PY" "$S/transcribe.py" edit.json --align           # 直した文に合わせて時刻を付け直す
 "$PY" "$S/faces.py" edit.json                        # 顔の位置（寄りの構図・カードを顔から避ける・サムネ）
@@ -61,8 +61,9 @@ PY=$(bash "$S/env.sh")          # 専用のPython環境（初回は自動作成�
 ```
 "$PY" "$S/render.py" edit.json --version <名前> --video        # 並列で書き出し（無音のマスター）
 "$PY" "$S/finish.py" edit.json --version <名前>                # 声のカット・BGM・効果音・-14 LUFS・軽量版・字幕・概要欄
-"$PY" "$S/thumb.py" edit.json --version <名前> --copy "…"      # YouTubeのサムネ3案（テストと比較用）
+"$PY" "$S/thumb.py" edit.json --version <名前> --copy "…"      # YouTubeはサムネ3案（テストと比較用）、ショート等はカバー2案
 ```
+- ショート・切り抜き・Vlog のカバーも thumb.py で作る。カバーA が `_カバー.png` になる（finish だけだと動画の1秒目＝字幕が入ったコマになり、警告が出る）。
 - 長い動画は書き出しに数分かかる。最初の1本は軽量版を送り（SendUserFile があればそれで。なければファイルの場所を伝える）、残りの見込み時間を添える。
 
 ### 8. 仕上げのチェック

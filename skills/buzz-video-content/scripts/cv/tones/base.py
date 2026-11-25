@@ -27,6 +27,9 @@ from cv.cues import JOIN
 
 LAYOUT = "tall" if TALL else "wide"
 SQUARE = W == H  # 1:1 takes a "square" value when a style gives one, else the "wide" one
+# a forced break (｜) whose line is up to ~10 % too wide is kept and drawn that much smaller; wider lines are laid out
+# again freely (viewers noticed subtitles jumping from 60 to 40 px when long lines were shrunk)
+KEEP_BREAK_SCALE = 0.9
 
 
 def _merge(a: dict, b: dict) -> dict:
@@ -135,32 +138,61 @@ class Look:
         return G.hexrgb(c) if c else None
 
     # -------------------------------------------------------------- subtitles
+    def _sub_max_w(self) -> float:
+        return (self.x1 - self.x0) * self.v("sub", "max_w", 0.92)
+
+    @functools.lru_cache(maxsize=None)
+    def sub_capacity(self) -> int:
+        """Full-width characters one subtitle line holds at full size (9:16 trust: 10); a longer line is shrunk."""
+        f = self.font("sub", float(self.v("sub", "size")))
+        return max(1, int(self._sub_max_w() // G.text_width("あ", f)))
+
+    @staticmethod
+    def _forced_lines(plain: str, flags: list[bool], at: int):
+        """Two lines split at the ｜ at index `at` (any other ｜ dropped)."""
+        def keep(lo: int, hi: int) -> tuple[str, tuple[bool, ...]]:
+            pairs = [(ch, fl) for ch, fl in zip(plain[lo:hi], flags[lo:hi]) if ch != JOIN]
+            return "".join(ch for ch, _ in pairs), tuple(fl for _, fl in pairs)
+        return keep(0, at), keep(at + 1, len(plain))
+
     @functools.lru_cache(maxsize=4096)
     def sub_layout(self, text: str) -> tuple[float, tuple[tuple[str, tuple[bool, ...]], ...]]:
-        """(font size, lines) for a subtitle: one line if it fits, else the best balanced 2-line break."""
+        """(font size, lines) for a subtitle: the forced break (｜) when both lines fit, else one line if it fits,
+        else the best balanced 2-line break; shrunk only when nothing fits two lines (cues_out reports it)."""
         plain, flags = spans(text)
         size = float(self.v("sub", "size"))
-        max_w = (self.x1 - self.x0) * self.v("sub", "max_w", 0.92)
+        max_w = self._sub_max_w()
         f = self.font("sub", size)
-        if JOIN in plain:
-            i = plain.index(JOIN)
-            a, b = plain[:i], plain[i + 1:].replace(JOIN, "")
-            fa, fb = flags[:i], [fl for ch, fl in zip(plain[i + 1:], flags[i + 1:]) if ch != JOIN]
-            lines = ((a, tuple(fa)), (b, tuple(fb)))
-        elif G.text_width(plain, f) <= max_w:
-            lines = ((plain, tuple(flags)),)
-        else:
-            lines = self._break(plain, flags, f, max_w, size)
-        widest = max(G.text_width(s, f) for s, _ in lines)
-        if widest > max_w:  # still too wide: shrink
-            size *= max_w / widest
+
+        def widest(ls) -> float:
+            return max(G.text_width(s, f) for s, _ in ls)
+
+        forced = [self._forced_lines(plain, flags, i) for i, ch in enumerate(plain) if ch == JOIN]
+        lines = next((ls for ls in forced if widest(ls) <= max_w), None)   # the author's first break that fits
+        if lines is None and forced and max_w / widest(forced[0]) >= KEEP_BREAK_SCALE:
+            lines = forced[0]                      # about a character over: keep the author's phrasing, a bit smaller
+        if lines is None:
+            free = "".join(ch for ch in plain if ch != JOIN)
+            ffl = [fl for ch, fl in zip(plain, flags) if ch != JOIN]
+            if G.text_width(free, f) <= max_w:
+                lines = ((free, tuple(ffl)),)
+            else:
+                lines = self._break(free, ffl, f, max_w, size)
+                if widest(lines) > max_w:          # no break outside 「」 fits: one inside the quote may
+                    lines = min((lines, self._break(free, ffl, f, max_w, size, quotes=False)), key=widest)
+            if widest(lines) > max_w:              # nothing fits two lines: the layout that shrinks least
+                lines = min([lines, *forced], key=widest)
+        if widest(lines) > max_w:  # still too wide: shrink
+            size *= max_w / widest(lines)
         return size, lines
 
-    def _break(self, plain: str, flags: list[bool], f: skia.Font, max_w: float, size: float):
+    def _break(self, plain: str, flags: list[bool], f: skia.Font, max_w: float, size: float, quotes: bool = True):
+        """Best balanced 2-line break; never inside a Latin name or before ん, and inside 「」 only with quotes=False."""
         costs = linebreak.break_costs(plain)
         best, best_i = None, len(plain) // 2
         for i, c in costs.items():
-            if _inside_latin(plain, i) or plain[i] == "ん" or plain[:i].count("「") > plain[:i].count("」"):
+            if _inside_latin(plain, i) or plain[i] == "ん" or \
+                    (quotes and plain[:i].count("「") > plain[:i].count("」")):
                 continue
             a, b = plain[:i], plain[i:]
             wa, wb = G.text_width(a, f), G.text_width(b, f)

@@ -15,7 +15,7 @@
 - **Five tastes for ads**: standard, motion, cinematic, narrated vlog and a chat-screen story (no LINE logo or name).
 - Transcription (Whisper), jump cuts that remove pauses, captions, explainer cards, chapter titles and an end screen. Claude writes an edit list and the engine renders it.
 - Captions and cards avoid faces (Apple Vision). Speakers are identified by voice and colour-coded; a line it cannot identify gets no name.
-- **Music and sound effects are composed and synthesized on the spot** (no existing songs or sample packs).
+- **Music and sound effects are composed and synthesized on the spot** (no existing songs or sample packs); talk videos can use your own or AI-generated audio files instead.
 - Loudness -14 LUFS with true peak at or below -1 dBTP, a light copy for phones, SRT subtitles, three thumbnail options, a YouTube description or post text.
 - Ads check industry rules (medical, acupuncture, cosmetics, ...) while the copy is written.
 

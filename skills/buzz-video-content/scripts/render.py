@@ -61,7 +61,8 @@ class Comp:
         cue_list = C.load(self.p.cues_path) if self.p.cues_path and os.path.exists(self.p.cues_path) else []
         if self.v.get("subs", True) is False:  # テロップなし: title / names / cards only
             cue_list = []
-        self.subs = C.for_version(cue_list, self.tl, self.look.SUBS["min_show"], self.look.SUBS.get("tidy", True))
+        self.subs = C.for_version(cue_list, self.tl, self.look.SUBS["min_show"], self.look.SUBS.get("tidy", True),
+                                  merge_max=min(C.MERGE_MAX, 2 * self.look.sub_capacity()))
         self.ovs = overlays.build(self.v, self.tl)
         from cv import layout
         layout.apply(self)  # cards / name plates / big words off the faces
@@ -160,21 +161,37 @@ class Comp:
             self.look.draw_overlay(self.c, ov, t)
 
     # -------------------------------------------------------------- cues for audio / finish
+    def _sub_out(self, s) -> dict:
+        """A subtitle as cues_out lists it; "scale" < 1 when no two-line layout fitted and it was drawn smaller."""
+        d = {"t0": round(s.t0, 3), "t1": round(s.t1, 3), "text": s.text, "speaker": s.speaker}
+        size, _ = self.look.sub_layout(s.text)
+        scale = size / float(self.look.v("sub", "size"))
+        if scale < 0.995:
+            d["scale"] = round(scale, 2)
+        return d
+
     def cues_out(self) -> dict:
         from cv import cues as C
         from cv.canvas import ASPECT, FPS
         tl, look = self.tl, self.look
         sfx = []
-        if self.v.get("sfx", True):
+        if self.v.get("sfx", True) is not False:  # true, or {"files": ...}
             for ov in self.ovs:
                 sfx += look.sfx(ov)
             for s in tl.shots:
                 if s.kind == "card" and s.f0 == min(x.f0 for x in tl.shots if x.part == s.part):
                     sfx += look.card_sfx(s.data, s.t0, s.n / FPS)
         vb = dict(self.v.get("bgm", {}))
-        audio = {**look.AUDIO, **{k: v for k, v in vb.items() if k != "style"}}
+        audio = {**look.AUDIO, **{k: v for k, v in vb.items() if k not in ("style", "file", "from")}}
         if "style" in vb:
             audio["bgm"] = vb["style"]
+        if vb.get("file"):  # a prepared / generated piece instead of a composed one
+            audio.update(bgm="file", bgm_file=self.p.path_of(vb["file"]), bgm_from=float(vb.get("from", 0.0)))
+            if self.v.get("snap") == "beat" and "bpm" not in vb:
+                audio["bpm_unknown"] = True
+        sv = self.v.get("sfx", True)
+        if isinstance(sv, dict) and sv.get("files"):
+            audio["sfx_files"] = {k: self.p.path_of(p) for k, p in sv["files"].items()}
         if self.v.get("snap") == "beat" or "bpm" in vb:
             audio["bpm"] = tl.bpm()
         return {
@@ -187,8 +204,8 @@ class Comp:
                       for s in tl.shots],
             "sections": [{"part": i, "kind": p["kind"], "card": p.get("card"), "t0": a, "t1": b}
                          for i, ((a, b), p) in enumerate(zip(tl.part_spans, self.v["parts"]))],
-            "subs": [{"t0": round(s.t0, 3), "t1": round(s.t1, 3), "text": s.text, "speaker": s.speaker}
-                     for s in self.subs],
+            "subs": [self._sub_out(s) for s in self.subs],
+            "sub_capacity": look.sub_capacity(),
             "overlays": [{"type": o.type, "t0": round(o.t0, 3), "t1": round(o.t1, 3), "text": o.text} for o in self.ovs],
             "chapters": [[round(o.t0, 2), o.text] for o in self.ovs if o.type == "chapter"],
             "sfx": sorted([[round(t, 3), n, g] for t, n, g in sfx]),

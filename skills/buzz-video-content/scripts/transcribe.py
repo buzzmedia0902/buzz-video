@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Transcribe the talk sources of edit.json and write draft subtitles (cues.json) to correct by hand.
 
-  python transcribe.py edit.json [--src talk] [--range 600 720] [--all] [--lang ja] [--max-chars 18] [--jobs 3]
+  python transcribe.py edit.json [--src talk] [--range 600 720] [--all] [--lang ja] [--max-chars 16] [--jobs 3]
   python transcribe.py edit.json --align        # after correcting cues.json: re-time the cues to the speech
 
 Only the source ranges the versions use are transcribed (the parts' from / to), unless --range or --all (the whole
@@ -186,7 +186,8 @@ def main() -> None:
     ap.add_argument("project")
     ap.add_argument("--src", nargs="*", help="source ids (default: every source used by a talk part)")
     ap.add_argument("--lang", default="ja")
-    ap.add_argument("--max-chars", type=int, default=18, help="characters per draft cue (9:16 ~ 14-16, 16:9 ~ 20)")
+    ap.add_argument("--max-chars", type=int, help="characters per draft cue (default: 16 when a version is vertical, "
+                    "two lines of ~10 unshrunk; else 20)")
     ap.add_argument("--jobs", type=int, default=3)
     ap.add_argument("--range", nargs=2, type=float, metavar=("FROM", "TO"), help="only this source range")
     ap.add_argument("--all", action="store_true", help="the whole source (for find.py on a long episode)")
@@ -194,6 +195,9 @@ def main() -> None:
     a = ap.parse_args()
     from cv import media, spec
     p = spec.load(a.project)
+    if a.max_chars is None:
+        tall = any(v.get("aspect", spec.DEFAULT_ASPECT[v["format"]]) in ("9:16", "4:5") for v in p.versions.values())
+        a.max_chars = 16 if tall else 20
     cues_path = p.cues_path or os.path.join(p.root, "cues.json")
     if a.align:
         cues = json.load(open(cues_path, encoding="utf-8"))
